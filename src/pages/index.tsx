@@ -5,8 +5,10 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import marshallIcon from "../../public/img/marshall-icon-black.svg";
 import marshallogo from "../../public/img/marshall-logo.png";
 import original from "../../public/img/marshall-original-home.png";
+import instagramIcon from "../../public/img/instagram-icon.svg";
 import { api } from "~/utils/api";
 import Image from "next/image";
+import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 
 const Home: NextPage = () => {
   const hello = api.example.hello.useQuery({ text: "from tRPC" });
@@ -42,9 +44,18 @@ const Home: NextPage = () => {
           </ul>
         </div>
       </nav>
-      <main className="flex min-h-screen flex-col items-center bg-neutral-900 pb-14 relative">
-        <div className="max-w-sm">
+      <main className="relative flex min-h-screen flex-col items-center bg-neutral-900 pb-14 pt-5">
+        <div className="max-w-sm px-5">
           <Image alt="Marshall logo" src={marshallogo} className="max-w-5" />
+        </div>
+        <div className="flex flex-col space-y-3 max-w-2xl rounded-xl border-2 border-red-600 px-6 py-4 mx-3 my-5">
+          <p className="text-neutral-50"><span className="text-red-600 font-bold">• Entregas via Motoboy:</span> entraremos em contato após a compra para conferir o melhor momento para a entrega e garantir que tenha alguém pra receber os molhos.</p>
+          <p className="text-neutral-50"><span className="text-red-600 font-bold">• Se você não for de Belo Horizonte e quiser a sua Marshall:</span> entre em contato com a gente pelo instagram <a
+            href="https://www.instagram.com/pimentamarshall/"
+            className="text-red-600 hover:text-lime-400 transition"
+          >
+            @pimentamarshall
+          </a> que daremos um jeito de te entregar mesmo assim 😉.</p>
         </div>
         <div className="flex max-w-2xl flex-wrap justify-center gap-8">
           <ProductCard />
@@ -52,44 +63,59 @@ const Home: NextPage = () => {
           <ProductCard />
           <ProductCard />
         </div>
-        <button className="absolute -bottom-6 rounded-xl border-2 border-red-600 px-7 py-3 font-semibold text-neutral-50 no-underline transition bg-neutral-900 hover:bg-red-600 hover:text-neutral-950">
-          Veja nossas bobagens no Instagram
-        </button>
-        
+        <a href="https://www.instagram.com/paraisodaspimentas/" className="absolute -bottom-7 flex rounded-xl border-2 border-red-600 bg-neutral-900 px-7 py-4 align-middle font-semibold text-neutral-50 no-underline transition hover:bg-red-600 ">
+          <Image
+            src={instagramIcon}
+            alt="Instagram icon"
+            className="mr-3 inline-block h-auto w-6"
+          />
+          Siga no Instagram
+        </a>
       </main>
-      <section className="w-full bg-neutral-950 pt-12 py-5">
-          <h2 className="mb-4 text-center text-2xl font-bold uppercase text-red-600">
-            Onde encontrar a Pimenta Marshall
-          </h2>
-          <div className="mx-auto flex max-w-xs space-x-3 rounded-xl border-2 border-red-600 p-3">
-            <div className="flex flex-col space-y-2">
-              <h4 className="text-lg font-bold text-red-600">
-                MERCADO CENTRAL - Paraíso das Pimentas
-              </h4>
-              <p className="text-amber-500">Loja</p>
-              <p className="text-neutral-50">
-                Av. Augusto de Lima, 744 - Centro - Belo Horizonte
-              </p>
-              <p className="text-neutral-50">
-                Instagram:{" "}
-                <a
-                  href="https://www.instagram.com/paraisodaspimentas/"
-                  className="text-red-600"
-                >
-                  @paraisodaspimentas
-                </a>
-              </p>
-            </div>
-          </div>
-        </section>
-        <footer className="w-full text-center bg-black text-neutral-700 text-xs py-3">
-          Copyright &copy; {new Date().getFullYear()} Pimenta Marshall
-        </footer>
+      <section className="w-full bg-neutral-950 px-3 py-10 pt-12">
+        <h2 className="mb-5 text-center text-2xl font-bold uppercase text-neutral-50">
+          Onde encontrar a Pimenta Marshall:
+        </h2>
+        <div className="flex max-w-2xl flex-wrap justify-center gap-8 mx-auto">
+          <StoreCard />
+          <StoreCard />
+          <StoreCard />
+          <StoreCard />
+        </div>
+      </section>
+      <footer className="w-full bg-black py-3 text-center text-xs text-neutral-700">
+        Copyright &copy; {new Date().getFullYear()} Pimenta Marshall
+      </footer>
     </>
   );
 };
 
 export default Home;
+
+const StoreCard: React.FC = () => {
+  return (
+    <div className="mx-auto flex max-w-xs space-x-3 rounded-xl border-2 border-red-600 p-3">
+      <div className="flex flex-col space-y-2">
+        <h4 className="text-lg font-bold text-red-600">
+          MERCADO CENTRAL - Paraíso das Pimentas
+        </h4>
+        <p className="text-lime-400">Loja</p>
+        <p className="text-neutral-50">
+          Av. Augusto de Lima, 744 - Centro - Belo Horizonte
+        </p>
+        <p className="text-neutral-50">
+          Instagram:{" "}
+          <a
+            href="https://www.instagram.com/paraisodaspimentas/"
+            className="text-red-600 hover:text-lime-400 transition"
+          >
+            @paraisodaspimentas
+          </a>
+        </p>
+      </div>
+    </div>
+  );
+};
 
 const ProductCard: React.FC = () => {
   return (
@@ -97,7 +123,7 @@ const ProductCard: React.FC = () => {
       <h2 className="bg-neutral-950 p-2 text-2xl font-bold text-red-600">
         Marshall Original - 250ml
       </h2>
-      <Image src={original} alt="Marshall Original" className=""/>
+      <Image src={original} alt="Marshall Original" className="" />
       <div className="flex flex-col space-y-2">
         <p className="text-lg font-bold text-red-600">Picância: 🔥🔥 • • •</p>
         <p className="text-lg font-bold text-red-600">R$25,00</p>
@@ -113,10 +139,11 @@ const ProductCard: React.FC = () => {
           type="number"
           name="qnty"
           id="qntyOriginal"
-          className="text-md w-20 rounded border border-red-600 bg-transparent text-center font-semibold text-gray-50 outline-none focus:outline-none "
+          defaultValue={1}
+          className="text-md w-16 rounded-lg border border-red-600 bg-transparent text-center font-semibold text-gray-50 outline-none [appearance:textfield] focus:outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none "
         />
-        <button className="rounded-full bg-white/10 px-7 py-3 font-semibold text-white no-underline transition hover:bg-white/20">
-          Adicionar ao carrinho
+        <button className="rounded-lg bg-white/10 px-7 py-3 font-semibold text-white no-underline transition hover:bg-red-600">
+          <ShoppingCartIcon className="h-5 w-5" />
         </button>
       </div>
     </div>
