@@ -52,7 +52,7 @@ const Home: NextPage = () => {
           <p className="text-neutral-50"><span className="text-red-600 font-bold">• Entregas via Motoboy:</span> entraremos em contato após a compra para conferir o melhor momento para a entrega e garantir que tenha alguém pra receber os molhos.</p>
           <p className="text-neutral-50"><span className="text-red-600 font-bold">• Se você não for de Belo Horizonte e quiser a sua Marshall:</span> entre em contato com a gente pelo instagram <a
             href="https://www.instagram.com/pimentamarshall/"
-            className="text-red-600 hover:text-lime-400 transition"
+            className="text-red-600 hover:text-lime-400 transition" target="_blank"
           >
             @pimentamarshall
           </a> que daremos um jeito de te entregar mesmo assim 😉.</p>
@@ -63,7 +63,7 @@ const Home: NextPage = () => {
           <ProductCard />
           <ProductCard />
         </div>
-        <a href="https://www.instagram.com/paraisodaspimentas/" className="absolute -bottom-7 flex rounded-xl border-2 border-red-600 bg-neutral-900 px-7 py-4 align-middle font-semibold text-neutral-50 no-underline transition hover:bg-red-600 ">
+        <a href="https://www.instagram.com/pimentamarshall/" className="absolute -bottom-7 flex rounded-xl border-2 border-red-600 bg-neutral-900 px-7 py-4 align-middle font-semibold text-neutral-50 no-underline transition hover:bg-red-600" target="_blank">
           <Image
             src={instagramIcon}
             alt="Instagram icon"
@@ -101,13 +101,19 @@ const StoreCard: React.FC = () => {
         </h4>
         <p className="text-lime-400">Loja</p>
         <p className="text-neutral-50">
-          Av. Augusto de Lima, 744 - Centro - Belo Horizonte
+          Av. Augusto de Lima, 744 - Centro - Belo Horizonte <a
+            href="https://goo.gl/maps/w2L4ojb8TGBtwvn16"
+            className="text-red-600 hover:text-lime-400 transition" target="_blank"
+          >
+            [ver no mapa]
+          </a>
         </p>
         <p className="text-neutral-50">
           Instagram:{" "}
           <a
             href="https://www.instagram.com/paraisodaspimentas/"
             className="text-red-600 hover:text-lime-400 transition"
+            target="_blank"
           >
             @paraisodaspimentas
           </a>
@@ -120,7 +126,7 @@ const StoreCard: React.FC = () => {
 const ProductCard: React.FC = () => {
   return (
     <div className="flex max-w-xs flex-col space-y-5 p-3">
-      <h2 className="bg-neutral-950 p-2 text-2xl font-bold text-red-600">
+      <h2 className="bg-neutral-950 p-2 rounded-sm text-2xl font-bold text-red-600">
         Marshall Original - 250ml
       </h2>
       <Image src={original} alt="Marshall Original" className="" />
