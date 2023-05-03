@@ -5,7 +5,7 @@ import marshallIcon from "../../public/img/marshall-icn-preto.png";
 import marshallogo from "../../public/img/marshall-logo.png";
 import original from "../../public/img/marshall-original-home.png";
 import instagramIcon from "../../public/img/Instagram-icon-white.png";
-import { api } from "~/utils/api";
+import { RouterOutputs, api } from "~/utils/api";
 import Image from "next/image";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 
@@ -13,6 +13,8 @@ const Home: NextPage = () => {
   // const hello = api.example.hello.useQuery({ text: "from tRPC" });
 
   const { data: sessionData } = useSession();
+
+  const {data} = api.product.getAll.useQuery()
 
   return (
     <>
@@ -26,7 +28,7 @@ const Home: NextPage = () => {
           <Image
             alt="Marshall icon"
             src={marshallIcon}
-            className="h-auto w-4"
+            className="w-5 h-auto"
           />
           <ul className="flex justify-center space-x-4 align-middle">
             <li className="self-center">
@@ -57,10 +59,7 @@ const Home: NextPage = () => {
           </a> que daremos um jeito de te entregar mesmo assim 😉.</p>
         </div>
         <div className="flex max-w-2xl flex-wrap justify-center gap-8">
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
+        {data?.map((product) => (<ProductCard key={product.id} {...product} />))}
         </div>
         <a href="https://www.instagram.com/pimentamarshall/" className="absolute -bottom-7 flex rounded-xl border-2 border-red-600 bg-neutral-900 px-7 py-4 align-middle font-semibold text-neutral-50 no-underline transition hover:bg-red-600" target="_blank">
           <Image
@@ -122,21 +121,41 @@ const StoreCard: React.FC = () => {
   );
 };
 
-const ProductCard: React.FC = () => {
+type Product = RouterOutputs["product"]["getAll"][number]
+
+const ProductCard = (props: Product) => {
+  const {name, id, description, image, price, picancia} = props
+
+  const getPicancia = () => {
+    if (!picancia) {
+      return null
+    }
+    let totalPicancia = "";
+
+    console.log(picancia)
+
+    for (let i = 0; i < 5; i++) {
+      if (i < picancia) {
+        totalPicancia = totalPicancia + "🔥"
+      } else {  totalPicancia = totalPicancia + " •" }
+    }
+    console.log(totalPicancia)
+    return totalPicancia
+  }
+
   return (
     <div className="flex max-w-xs flex-col space-y-5 p-3">
       <h2 className="bg-neutral-950 p-2 rounded-sm text-2xl font-bold text-red-600">
-        Marshall Original - 250ml
+        {name}
       </h2>
       <Image src={original} alt="Marshall Original" className="" />
       <div className="flex flex-col space-y-2">
-        <p className="text-lg font-bold text-red-600">Picância: 🔥🔥 • • •</p>
-        <p className="text-lg font-bold text-red-600">R$25,00</p>
+        <p className="text-lg font-bold text-red-600">Picância: {getPicancia()}
+          {}
+        </p>
+        <p className="text-lg font-bold text-red-600">R$ {price}</p>
         <p className="text-neutral-50">
-          A Marshall é um molho de pimenta artesanal fermentado com especiarias
-          no estilo sriracha e de picância baixa ou mediana (isso é
-          completamente subjetivo, se você já comeu e achou ela “fraquinha”
-          parabéns para você e o seu butãozinho de diamante).
+          {description}
         </p>
       </div>
       <div className="flex space-x-3">

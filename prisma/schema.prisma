@@ -15,10 +15,93 @@ datasource db {
     // relationMode = "prisma"
 }
 
-model Example {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+model Product {
+    id          String      @id @default(cuid())
+    name        String
+    image       String
+    description String
+    price       Float
+    salePrice   Float?
+    stock       Int
+    picancia    Int?
+    isActive    Boolean
+    CartItem    CartItem[]
+    OrderItem   OrderItem[]
+}
+
+model Address {
+    id         String      @id @default(cuid())
+    address1   String
+    number     Int
+    complement String?
+    bairro     String?
+    city       String
+    region     String
+    postalCode Int
+    user       User        @relation(fields: [userId], references: [id])
+    userId     String      @unique
+    shopOrder  ShopOrder[]
+}
+
+model ShopOrder {
+    id               String         @id @default(cuid())
+    status           PaymentStatus
+    totalValue       Float
+    createdAt        DateTime       @default(now())
+    updatedAt        DateTime       @updatedAt
+    shippingAddress  Address        @relation(fields: [addressId], references: [id])
+    addressId        String
+    paymentMethod    PaymentMethod
+    shippingMethod   ShippingMethod @relation(fields: [shippingMethodId], references: [id])
+    shippingMethodId String
+    items            OrderItem[]
+}
+
+model ShoppingSession {
+    id        String     @id @default(cuid())
+    user      User       @relation(fields: [userId], references: [id])
+    userId    String     @unique
+    total     Float      @default(0)
+    createdAt DateTime   @default(now())
+    updatedAt DateTime   @updatedAt
+    CartItem  CartItem[]
+}
+
+model CartItem {
+    id                String          @id @default(cuid())
+    shoppingSession   ShoppingSession @relation(fields: [shoppingSessionId], references: [id])
+    shoppingSessionId String
+    product           Product         @relation(fields: [productId], references: [id])
+    quantity          Int
+    productId         String
+}
+
+model OrderItem {
+    id            String    @id @default(cuid())
+    shoppingOrder ShopOrder @relation(fields: [shopOrderId], references: [id])
+    item          Product   @relation(fields: [productId], references: [id])
+    shopOrderId   String
+    productId     String
+    quantity      Int
+    value         Float
+}
+
+model ShippingMethod {
+    id        String      @id @default(cuid())
+    name      String
+    price     Float?
+    ShopOrder ShopOrder[]
+}
+
+enum PaymentStatus {
+    PENDING
+    PROCESSING
+    DELIVERED
+}
+
+enum PaymentMethod {
+    PIX
+    PAGSEGURO
 }
 
 // Necessary for Next auth
@@ -49,13 +132,15 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
+    id              String           @id @default(cuid())
+    name            String?
+    email           String?          @unique
+    emailVerified   DateTime?
+    image           String?
+    accounts        Account[]
+    sessions        Session[]
+    Address         Address?
+    ShoppingSession ShoppingSession?
 }
 
 model VerificationToken {
