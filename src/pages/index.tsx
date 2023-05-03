@@ -8,6 +8,7 @@ import instagramIcon from "../../public/img/Instagram-icon-white.png";
 import { RouterOutputs, api } from "~/utils/api";
 import Image from "next/image";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
+import { useState } from "react";
 
 const Home: NextPage = () => {
   // const hello = api.example.hello.useQuery({ text: "from tRPC" });
@@ -125,6 +126,19 @@ type Product = RouterOutputs["product"]["getAll"][number]
 
 const ProductCard = (props: Product) => {
   const {name, id, description, image, price, picancia} = props
+  const [count, setCount] = useState(1)
+
+  const qntyIncrement = () => {
+    setCount(count + 1);
+  }
+
+  const qntyDecrement = () => {
+    if (count <= 1) {
+      return null
+    }
+    
+    setCount(count - 1);
+  }
 
   const getPicancia = () => {
     if (!picancia) {
@@ -147,8 +161,7 @@ const ProductCard = (props: Product) => {
       </h2>
       <Image src={image} alt={`${name} image`} width={1080} height={1080}/>
       <div className="flex flex-col space-y-2">
-        <p className="text-lg font-bold text-red-600">Picância: {getPicancia()}
-          {}
+        <p className="text-lg font-bold text-red-600">Picância: <span className="text-neutral-700">{getPicancia()}</span>
         </p>
         <p className="text-lg font-bold text-red-600">R$ {price}</p>
         <p className="text-neutral-50">
@@ -156,13 +169,18 @@ const ProductCard = (props: Product) => {
         </p>
       </div>
       <div className="flex space-x-3">
+        <div className="flex align-middle justify-center rounded-lg border border-red-600 bg-transparent">
+      <button className="text-red-600 w-8 font-bold pb-1" onClick={qntyDecrement}>–</button>
         <input
           type="number"
           name="qnty"
           id="qntyOriginal"
-          defaultValue={1}
-          className="text-md w-16 rounded-lg border border-red-600 bg-transparent text-center font-semibold text-gray-50 outline-none [appearance:textfield] focus:outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none "
+          defaultValue={count}
+          value={count}
+          className="text-md w-7 bg-transparent text-center font-semibold text-gray-50 outline-none [appearance:textfield] focus:outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none "
         />
+        <button className="text-red-600 w-8 font-bold pb-1" onClick={qntyIncrement}>+</button>
+        </div>
         <button className="rounded-lg bg-white/10 px-7 py-3 font-semibold text-white no-underline transition hover:bg-red-600">
           <ShoppingCartIcon className="h-5 w-5" />
         </button>
