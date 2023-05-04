@@ -16,12 +16,13 @@ datasource db {
 }
 
 model Reseller {
-    id        String  @id @default(cuid())
-    name      String
-    storeType String?
-    address   String
-    mapsLink  String
-    hyperLink String
+    id              String  @id @default(cuid())
+    name            String
+    storeType       String?
+    address         String
+    mapsLink        String
+    instagram       String?
+    instagramHandle String?
 }
 
 model Product {

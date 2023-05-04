@@ -11,25 +11,30 @@ import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 
 const Home: NextPage = () => {
-  // const hello = api.example.hello.useQuery({ text: "from tRPC" });
-
   const { data: sessionData } = useSession();
 
-  const {data} = api.product.getAll.useQuery()
+  const products = api.product.getAll.useQuery().data;
+  const resellers = api.reseller.getAll.useQuery().data;
 
   return (
     <>
       <Head>
         <title>Home | Pimenta Marshall</title>
-        <meta name="description" content="A Marshall é um molho de pimenta artesanal de produção minúscula fermentado com especiarias no estilo sriracha." />
+        <meta
+          name="description"
+          content="A Marshall é um molho de pimenta artesanal de produção minúscula fermentado com especiarias no estilo sriracha."
+        />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <nav className="flex sticky top-0 z-10 justify-center space-x-0 bg-red-600 px-5 align-middle" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+      <nav
+        className="sticky top-0 z-10 flex justify-center space-x-0 bg-red-600 px-5 align-middle"
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      >
         <div className="flex w-full max-w-2xl justify-between space-x-3 py-2">
           <Image
             alt="Marshall icon"
             src={marshallIcon}
-            className="w-5 h-auto"
+            className="h-auto w-5"
           />
           <ul className="flex justify-center space-x-4 align-middle">
             <li className="self-center">
@@ -42,7 +47,11 @@ const Home: NextPage = () => {
                 {sessionData ? "Sair" : "Entrar"}
               </button>
             </li>
-            <li className="self-center"><button className="group no-underline bg-neutral-900 p-3 rounded-full"><ShoppingCartIcon className="w-6 h-6 stroke-red-600 group-hover:stroke-neutral-50 transition" /></button></li>
+            <li className="self-center">
+              <button className="group rounded-full bg-neutral-900 p-3 no-underline">
+                <ShoppingCartIcon className="h-6 w-6 stroke-red-600 transition group-hover:stroke-neutral-50" />
+              </button>
+            </li>
           </ul>
         </div>
       </nav>
@@ -50,19 +59,39 @@ const Home: NextPage = () => {
         <div className="max-w-sm px-5">
           <Image alt="Marshall logo" src={marshallogo} className="max-w-5" />
         </div>
-        <div className="flex flex-col space-y-3 max-w-2xl rounded-xl border-2 border-red-600 px-6 py-4 mx-3 my-5">
-          <p className="text-neutral-50"><span className="text-red-600 font-bold">• Entregas via Motoboy:</span> entraremos em contato após a compra para conferir o melhor momento para a entrega e garantir que tenha alguém pra receber os molhos.</p>
-          <p className="text-neutral-50"><span className="text-red-600 font-bold">• Se você não for de Belo Horizonte e quiser a sua Marshall:</span> entre em contato com a gente pelo instagram <a
-            href="https://www.instagram.com/pimentamarshall/"
-            className="text-red-600 hover:text-lime-400 transition" target="_blank"
-          >
-            @pimentamarshall
-          </a> que daremos um jeito de te entregar mesmo assim 😉.</p>
+        <div className="mx-3 my-5 flex max-w-2xl flex-col space-y-3 rounded-xl border-2 border-red-600 px-6 py-4">
+          <p className="text-neutral-50">
+            <span className="font-bold text-red-600">
+              • Entregas via Motoboy:
+            </span>{" "}
+            entraremos em contato após a compra para conferir o melhor momento
+            para a entrega e garantir que tenha alguém pra receber os molhos.
+          </p>
+          <p className="text-neutral-50">
+            <span className="font-bold text-red-600">
+              • Se você não for de Belo Horizonte e quiser a sua Marshall:
+            </span>{" "}
+            entre em contato com a gente pelo instagram{" "}
+            <a
+              href="https://www.instagram.com/pimentamarshall/"
+              className="text-red-600 transition hover:text-lime-400"
+              target="_blank"
+            >
+              @pimentamarshall
+            </a>{" "}
+            que daremos um jeito de te entregar mesmo assim 😉.
+          </p>
         </div>
         <div className="flex max-w-2xl flex-wrap justify-center gap-8">
-        {data?.map((product) => (<ProductCard key={product.id} {...product} />))}
+          {products?.map((product) => (
+            <ProductCard key={product.id} {...product} />
+          ))}
         </div>
-        <a href="https://www.instagram.com/pimentamarshall/" className="absolute -bottom-7 flex rounded-xl border-2 border-red-600 bg-neutral-900 px-7 py-4 align-middle font-semibold text-neutral-50 no-underline transition hover:bg-red-600" target="_blank">
+        <a
+          href="https://www.instagram.com/pimentamarshall/"
+          className="absolute -bottom-7 flex rounded-xl border-2 border-red-600 bg-neutral-900 px-7 py-4 align-middle font-semibold text-neutral-50 no-underline transition hover:bg-red-600"
+          target="_blank"
+        >
           <Image
             src={instagramIcon}
             alt="Instagram icon"
@@ -75,11 +104,10 @@ const Home: NextPage = () => {
         <h2 className="mb-5 text-center text-2xl font-bold uppercase text-neutral-50">
           Onde encontrar a Pimenta Marshall:
         </h2>
-        <div className="flex max-w-2xl flex-wrap justify-center gap-8 mx-auto">
-          <StoreCard />
-          <StoreCard />
-          <StoreCard />
-          <StoreCard />
+        <div className="mx-auto flex max-w-2xl flex-wrap justify-center gap-8">
+          {resellers?.map((reseller) => (
+            <StoreCard key={reseller.id} {...reseller} />
+          ))}
         </div>
       </section>
       <footer className="w-full bg-black py-3 text-center text-xs text-neutral-700">
@@ -91,95 +119,116 @@ const Home: NextPage = () => {
 
 export default Home;
 
-const StoreCard: React.FC = () => {
+type Reseller = RouterOutputs["reseller"]["getAll"][number];
+
+const StoreCard = (props: Reseller) => {
+  const { name, id, address, instagram, instagramHandle, mapsLink, storeType } =
+    props;
+
   return (
     <div className="mx-auto flex max-w-xs space-x-3 rounded-xl border-2 border-red-600 p-3">
       <div className="flex flex-col space-y-2">
-        <h4 className="text-lg font-bold text-red-600">
-          MERCADO CENTRAL - Paraíso das Pimentas
-        </h4>
-        <p className="text-lime-400">Loja</p>
+        <h4 className="text-lg font-bold text-red-600">{name}</h4>
+        <p className="text-lime-400">{storeType}</p>
         <p className="text-neutral-50">
-          Av. Augusto de Lima, 744 - Centro - Belo Horizonte <a
-            href="https://goo.gl/maps/w2L4ojb8TGBtwvn16"
-            className="text-red-600 hover:text-lime-400 transition" target="_blank"
+          {address}{" "}
+          <a
+            href={mapsLink}
+            className="text-red-600 transition hover:text-lime-400"
+            target="_blank"
           >
             [ver no mapa]
           </a>
         </p>
-        <p className="text-neutral-50">
-          Instagram:{" "}
-          <a
-            href="https://www.instagram.com/paraisodaspimentas/"
-            className="text-red-600 hover:text-lime-400 transition"
-            target="_blank"
-          >
-            @paraisodaspimentas
-          </a>
-        </p>
+        {instagram && (
+          <p className="text-neutral-50">
+            Instagram:{" "}
+            <a
+              href={instagram}
+              className="text-red-600 transition hover:text-lime-400"
+              target="_blank"
+            >
+              {instagramHandle}
+            </a>
+          </p>
+        )}
       </div>
     </div>
   );
 };
 
-type Product = RouterOutputs["product"]["getAll"][number]
+type Product = RouterOutputs["product"]["getAll"][number];
 
 const ProductCard = (props: Product) => {
-  const {name, id, description, image, price, picancia} = props
-  const [count, setCount] = useState(1)
+  const { name, id, description, image, price, picancia } = props;
+  const [count, setCount] = useState(1);
 
   const qntyIncrement = () => {
     setCount(count + 1);
-  }
+  };
 
   const qntyDecrement = () => {
     if (count <= 1) {
-      return null
+      return null;
     }
-    
+
     setCount(count - 1);
-  }
+  };
 
   const getPicancia = () => {
     if (!picancia) {
-      return null
+      return null;
     }
     let totalPicancia = "";
 
     for (let i = 0; i < 5; i++) {
       if (i < picancia) {
-        totalPicancia = totalPicancia + "🔥"
-      } else {  totalPicancia = totalPicancia + " •" }
+        totalPicancia = totalPicancia + "🔥";
+      } else {
+        totalPicancia = totalPicancia + " •";
+      }
     }
-    return totalPicancia
-  }
+    return totalPicancia;
+  };
 
   return (
-    <div className="flex max-w-xs flex-col space-y-5 p-3">
-      <h2 className="bg-neutral-950 p-2 rounded-sm text-2xl font-bold text-red-600">
+    <div className="flex max-w-xs flex-col space-y-4 p-3">
+      <h2 className="rounded-sm bg-neutral-950 p-2 text-2xl font-bold text-red-600">
         {name}
       </h2>
-      <Image src={image} alt={`${name} image`} width={1080} height={1080}/>
-      <div className="flex flex-col space-y-2">
-        <p className="text-lg font-bold text-red-600">Picância: <span className="text-neutral-700">{getPicancia()}</span>
-        </p>
-        <p className="text-lg font-bold text-red-600">R$ {price}</p>
-        <p className="text-neutral-50">
-          {description}
-        </p>
+      <Image src={image} alt={`${name} image`} width={1080} height={1080} />
+      <div className="flex flex-col space-y-3">
+        <div className="flex justify-between align-middle">
+        <p className="text-3xl font-bold text-red-600 self-center"><span className="text-2xl font-normal">R$</span> {price.toFixed(2)}</p>
+          <div className="rounded-xl border border-red-600 px-3 py-3">
+            <p className="font-bold text-neutral-700 leading-tight">
+              {getPicancia()}
+            </p>
+          </div>
+        </div>
+        <p className="text-neutral-50">{description}</p>
       </div>
       <div className="flex space-x-3">
-        <div className="flex align-middle justify-center rounded-lg border border-red-600 bg-transparent">
-      <button className="text-red-600 w-8 font-bold pb-1" onClick={qntyDecrement}>–</button>
-        <input
-          type="number"
-          name="qnty"
-          id="qntyOriginal"
-          defaultValue={count}
-          value={count}
-          className="text-md w-7 bg-transparent text-center font-semibold text-gray-50 outline-none [appearance:textfield] focus:outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none "
-        />
-        <button className="text-red-600 w-8 font-bold pb-1" onClick={qntyIncrement}>+</button>
+        <div className="flex justify-center rounded-lg border border-red-600 bg-transparent align-middle">
+          <button
+            className="w-8 pb-1 font-bold text-red-600"
+            onClick={qntyDecrement}
+          >
+            –
+          </button>
+          <input
+            type="number"
+            name="qnty"
+            id="qntyOriginal"
+            value={count}
+            className="text-md w-7 bg-transparent text-center font-semibold text-gray-50 outline-none [appearance:textfield] focus:outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none "
+          />
+          <button
+            className="w-8 pb-1 font-bold text-red-600"
+            onClick={qntyIncrement}
+          >
+            +
+          </button>
         </div>
         <button className="rounded-lg bg-white/10 px-7 py-3 font-semibold text-white no-underline transition hover:bg-red-600">
           <ShoppingCartIcon className="h-5 w-5" />
