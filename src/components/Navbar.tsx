@@ -2,6 +2,7 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import marshallIcon from "../../public/img/marshall-icn-preto.png";
 import Image from "next/image";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
+import Link from "next/link";
 
 const Navbar: React.FC = () => {
   const { data: sessionData } = useSession();
@@ -9,10 +10,10 @@ const Navbar: React.FC = () => {
   return (
     <nav
       className="sticky top-0 z-10 flex justify-center space-x-0 bg-red-600 px-5 align-middle"
-      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
     >
       <div className="flex w-full max-w-2xl justify-between space-x-3 py-2">
-        <Image alt="Marshall icon" src={marshallIcon} className="h-auto w-5" />
+        <Link href={"/"} className="min-w-fit"><Image alt="Marshall icon" src={marshallIcon} className="h-auto w-5" /></Link>
+        <div className="w-full" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}></div>
         <ul className="flex justify-center space-x-4 align-middle">
           <li className="self-center">
             <button

@@ -1,9 +1,6 @@
 import { type NextPage } from "next";
 import Head from "next/head";
-import { signIn, signOut, useSession } from "next-auth/react";
-import marshallIcon from "../../public/img/marshall-icn-preto.png";
 import marshallogo from "../../public/img/marshall-logo.png";
-import original from "../../public/img/marshall-original-home.png";
 import instagramIcon from "../../public/img/Instagram-icon-white.png";
 import { RouterOutputs, api } from "~/utils/api";
 import Image from "next/image";
@@ -12,8 +9,6 @@ import { useState } from "react";
 import Navbar from "~/components/Navbar";
 
 const Home: NextPage = () => {
-  const { data: sessionData } = useSession();
-
   const products = api.product.getAll.useQuery().data;
   const resellers = api.reseller.getAll.useQuery().data;
 
@@ -28,7 +23,7 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Navbar />
-      <main className="relative flex min-h-screen flex-col items-center bg-neutral-900 pb-14 pt-5">
+      <main className="relative flex min-h-screen flex-col items-center bg-neutral-900 pb-16 pt-5">
         <div className="max-w-sm px-5">
           <Image alt="Marshall logo" src={marshallogo} className="max-w-5" />
         </div>
@@ -73,7 +68,7 @@ const Home: NextPage = () => {
           Siga no Instagram
         </a>
       </main>
-      <section className="w-full bg-neutral-950 px-3 py-10 pt-12">
+      <section className="w-full bg-neutral-950 px-3 py-10 pt-16">
         <h2 className="mb-5 text-center text-2xl font-bold uppercase text-neutral-50">
           Onde encontrar a Pimenta Marshall:
         </h2>
