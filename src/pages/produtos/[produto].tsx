@@ -1,14 +1,15 @@
-import { InferGetStaticPropsType, type NextPage } from "next";
+import { type NextPage } from "next";
 import Head from "next/head";
-import marshallogo from "../../public/img/marshall-logo.png";
-import instagramIcon from "../../public/img/Instagram-icon-white.png";
+import instagramIcon from "../../../public/img/Instagram-icon-white.png";
 import { RouterOutputs, api } from "~/utils/api";
 import Image from "next/image";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import Navbar from "~/components/Navbar";
 
-const Home = ({products, resellers}: InferGetStaticPropsType<typeof getStaticProps>) => {
+const Home: NextPage = () => {
+  const products = api.product.getAll.useQuery().data;
+  const resellers = api.reseller.getAll.useQuery().data;
 
   return (
     <>
@@ -22,35 +23,9 @@ const Home = ({products, resellers}: InferGetStaticPropsType<typeof getStaticPro
       </Head>
       <Navbar />
       <main className="relative flex min-h-screen flex-col items-center bg-neutral-900 pb-16 pt-5">
-        <div className="max-w-sm px-5">
-          <Image alt="Marshall logo" src={marshallogo} className="max-w-5" />
-        </div>
-        <div className="mx-3 my-5 flex max-w-2xl flex-col space-y-3 rounded-xl border-2 border-red-600 px-6 py-4">
-          <p className="text-neutral-50">
-            <span className="font-bold text-red-600">
-              • Entregas via Motoboy:
-            </span>{" "}
-            entraremos em contato após a compra para conferir o melhor momento
-            para a entrega e garantir que tenha alguém pra receber os molhos.
-          </p>
-          <p className="text-neutral-50">
-            <span className="font-bold text-red-600">
-              • Se você não for de Belo Horizonte e quiser a sua Marshall:
-            </span>{" "}
-            entre em contato com a gente pelo instagram{" "}
-            <a
-              href="https://www.instagram.com/pimentamarshall/"
-              className="text-red-600 transition hover:text-lime-400"
-              target="_blank"
-            >
-              @pimentamarshall
-            </a>{" "}
-            que daremos um jeito de te entregar mesmo assim 😉.
-          </p>
-        </div>
         <div className="flex max-w-2xl flex-wrap justify-center gap-8">
           {products?.map((product) => (
-            <ProductCard key={product.id} {...product} />
+            <ProductPageDetails key={product.id} {...product} />
           ))}
         </div>
         <a
@@ -125,7 +100,7 @@ const StoreCard = (props: Reseller) => {
 
 type Product = RouterOutputs["product"]["getAll"][number];
 
-const ProductCard = (props: Product) => {
+const ProductPageDetails = (props: Product) => {
   const { name, id, description, image, price, picancia } = props;
   const [count, setCount] = useState(1);
 
@@ -203,41 +178,3 @@ const ProductCard = (props: Product) => {
     </div>
   );
 };
-
-export async function getStaticProps() {
-
-  const products = api.product.getAll.useQuery().data;
-  const resellers = api.reseller.getAll.useQuery().data;
-
-
-  return {
-
-    props : { products, resellers }
-
-  }
-
-}
-
-// const AuthShowcase: React.FC = () => {
-//   const { data: sessionData } = useSession();
-
-//   const { data: secretMessage } = api.example.getSecretMessage.useQuery(
-//     undefined, // no input
-//     { enabled: sessionData?.user !== undefined }
-//   );
-
-//   return (
-//     <div className="flex flex-col items-center justify-center gap-4">
-//       <p className="text-center text-2xl text-white">
-//         {sessionData && <span>Logged in as {sessionData.user?.name}</span>}
-//         {secretMessage && <span> - {secretMessage}</span>}
-//       </p>
-//       <button
-//         className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
-//         onClick={sessionData ? () => void signOut() : () => void signIn()}
-//       >
-//         {sessionData ? "Sign out" : "Sign in"}
-//       </button>
-//     </div>
-//   );
-// };

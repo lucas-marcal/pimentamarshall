@@ -9,7 +9,7 @@ const Navbar: React.FC = () => {
 
   return (
     <nav
-      className="sticky top-0 z-10 flex justify-center space-x-0 bg-red-600 px-5 align-middle"
+      className="sticky top-0 z-10 flex justify-center space-x-0 bg-red-600 px-5 align-middle drop-shadow"
     >
       <div className="flex w-full max-w-2xl justify-between space-x-3 py-2">
         <Link href={"/"} className="min-w-fit"><Image alt="Marshall icon" src={marshallIcon} className="h-auto w-5" /></Link>
