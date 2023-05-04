@@ -23,6 +23,7 @@ model Reseller {
     mapsLink        String
     instagram       String?
     instagramHandle String?
+    orderOnPage Int?
 }
 
 model Product {
@@ -37,6 +38,7 @@ model Product {
     isActive    Boolean
     CartItem    CartItem[]
     OrderItem   OrderItem[]
+    orderOnPage Int?
 }
 
 model Address {

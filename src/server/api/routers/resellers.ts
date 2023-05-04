@@ -9,7 +9,7 @@ import {
 export const resellerRouter = createTRPCRouter({
 
   getAll: publicProcedure.query(async ({ ctx }) => {
-    const resellers = await ctx.prisma.reseller.findMany();
+    const resellers = await ctx.prisma.reseller.findMany({orderBy: [{orderOnPage: "asc"}]});
 
     return resellers
   }),

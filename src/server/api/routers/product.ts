@@ -9,7 +9,7 @@ import {
 export const productRouter = createTRPCRouter({
 
   getAll: publicProcedure.query(async ({ ctx }) => {
-    const products = await ctx.prisma.product.findMany();
+    const products = await ctx.prisma.product.findMany({orderBy: [{orderOnPage: "asc"}]});
 
     return products
   }),
