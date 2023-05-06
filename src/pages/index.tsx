@@ -1,4 +1,5 @@
-import { InferGetStaticPropsType, type NextPage } from "next";
+import { InferGetStaticPropsType, GetStaticPropsContext, type NextPage } from "next";
+import { createServerSideHelpers } from '@trpc/react-query/server';
 import Head from "next/head";
 import marshallogo from "../../public/img/marshall-logo.png";
 import instagramIcon from "../../public/img/Instagram-icon-white.png";
@@ -7,8 +8,13 @@ import Image from "next/image";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import Navbar from "~/components/Navbar";
+import { appRouter } from "~/server/api/root";
+import { createInnerTRPCContext } from "~/server/api/trpc";
+import SuperJSON from "superjson";
 
-const Home = ({products, resellers}: InferGetStaticPropsType<typeof getStaticProps>) => {
+const Home = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
+  const products = api.product.getAll.useQuery().data;
+  const resellers = api.reseller.getAll.useQuery().data;
 
   return (
     <>
@@ -71,7 +77,7 @@ const Home = ({products, resellers}: InferGetStaticPropsType<typeof getStaticPro
           Onde encontrar a Pimenta Marshall:
         </h2>
         <div className="mx-auto flex max-w-2xl flex-wrap justify-center gap-8">
-          {resellers?.map((reseller) => (
+          {resellers && resellers.map((reseller) => (
             <StoreCard key={reseller.id} {...reseller} />
           ))}
         </div>
@@ -204,15 +210,24 @@ const ProductCard = (props: Product) => {
   );
 };
 
-export async function getStaticProps() {
+export async function getStaticProps(context: GetStaticPropsContext<{ id: string }>) {
 
-  const products = api.product.getAll.useQuery().data;
-  const resellers = api.reseller.getAll.useQuery().data;
+  const helpers = createServerSideHelpers({
+    router: appRouter,
+    ctx: createInnerTRPCContext({session: null }),
+    transformer: SuperJSON, // optional - adds superjson serialization
+  });
+  // const id = context.params?.id as string;
+  // prefetch `post.byId`
 
+  await helpers.product.getAll.prefetch()
+  await helpers.reseller.getAll.prefetch()
 
   return {
 
-    props : { products, resellers }
+    props : { 
+      trpcState: helpers.dehydrate(),
+    }
 
   }
 
