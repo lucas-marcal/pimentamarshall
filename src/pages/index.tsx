@@ -1,9 +1,9 @@
-import { InferGetStaticPropsType, GetStaticPropsContext, type NextPage } from "next";
+import { type InferGetStaticPropsType, GetStaticPropsContext, type NextPage } from "next";
 import { createServerSideHelpers } from '@trpc/react-query/server';
 import Head from "next/head";
 import marshallogo from "../../public/img/marshall-logo.png";
 import instagramIcon from "../../public/img/Instagram-icon-white.png";
-import { RouterOutputs, api } from "~/utils/api";
+import { type RouterOutputs, api } from "~/utils/api";
 import Image from "next/image";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
@@ -94,7 +94,7 @@ export default Home;
 type Reseller = RouterOutputs["reseller"]["getAll"][number];
 
 const StoreCard = (props: Reseller) => {
-  const { name, id, address, instagram, instagramHandle, mapsLink, storeType } =
+  const { name, address, instagram, instagramHandle, mapsLink, storeType } =
     props;
 
   return (
@@ -132,7 +132,7 @@ const StoreCard = (props: Reseller) => {
 type Product = RouterOutputs["product"]["getAll"][number];
 
 const ProductCard = (props: Product) => {
-  const { name, id, description, image, price, picancia } = props;
+  const { name, description, image, price, picancia } = props;
   const [count, setCount] = useState(1);
 
   const qntyIncrement = () => {
@@ -210,7 +210,7 @@ const ProductCard = (props: Product) => {
   );
 };
 
-export async function getStaticProps(context: GetStaticPropsContext<{ id: string }>) {
+export async function getStaticProps() {
 
   const helpers = createServerSideHelpers({
     router: appRouter,
