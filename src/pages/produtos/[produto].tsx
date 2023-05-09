@@ -10,10 +10,10 @@ import Navbar from "~/components/Navbar";
 import { appRouter } from "~/server/api/root";
 import { createInnerTRPCContext } from "~/server/api/trpc";
 import SuperJSON from "superjson";
-import { prisma } from "~/server/db";
 
-const Home = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
-  const product = api.product.getBySlug.useQuery("marshall-original-250ml").data
+const Produto = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
+
+  const product = api.product.getBySlug.useQuery(props.urlSlug).data
 
   return (
     <>
@@ -50,7 +50,7 @@ const Home = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
   );
 };
 
-export default Home;
+export default Produto;
 
 type Product = RouterOutputs["product"]["getAll"][number];
 
@@ -133,7 +133,7 @@ const ProductCard = (props: Product) => {
   );
 };
 
-export async function getStaticProps(context: GetStaticPropsContext<{ urlSlug: string }>) {
+export async function getStaticProps(context: GetStaticPropsContext) {
 
   const helpers = createServerSideHelpers({
     router: appRouter,
@@ -141,7 +141,7 @@ export async function getStaticProps(context: GetStaticPropsContext<{ urlSlug: s
     transformer: SuperJSON, // optional - adds superjson serialization
   });
 
-  const urlSlug = context.params?.urlSlug as string;
+  const urlSlug = context.params?.produto as string
 
   await helpers.product.getBySlug.prefetch(urlSlug)
 
@@ -149,6 +149,7 @@ export async function getStaticProps(context: GetStaticPropsContext<{ urlSlug: s
 
     props : { 
       trpcState: helpers.dehydrate(),
+      urlSlug,
     }
 
   }
