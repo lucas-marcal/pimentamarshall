@@ -11,6 +11,8 @@ import Navbar from "~/components/Navbar";
 import { appRouter } from "~/server/api/root";
 import { createInnerTRPCContext } from "~/server/api/trpc";
 import SuperJSON from "superjson";
+import StoreCard from "~/components/StoreCard";
+import Link from "next/link";
 
 const Home = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
   const products = api.product.getAll.useQuery().data;
@@ -91,48 +93,10 @@ const Home = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
 
 export default Home;
 
-type Reseller = RouterOutputs["reseller"]["getAll"][number];
-
-const StoreCard = (props: Reseller) => {
-  const { name, address, instagram, instagramHandle, mapsLink, storeType } =
-    props;
-
-  return (
-    <div className="mx-auto flex max-w-xs space-x-3 rounded-xl border-2 border-red-600 p-3">
-      <div className="flex flex-col space-y-2">
-        <h4 className="text-lg font-bold text-red-600">{name}</h4>
-        <p className="text-lime-400">{storeType}</p>
-        <p className="text-neutral-50">
-          {address}{" "}
-          <a
-            href={mapsLink}
-            className="text-red-600 transition hover:text-lime-400"
-            target="_blank"
-          >
-            [ver no mapa]
-          </a>
-        </p>
-        {instagram && (
-          <p className="text-neutral-50">
-            Instagram:{" "}
-            <a
-              href={instagram}
-              className="text-red-600 transition hover:text-lime-400"
-              target="_blank"
-            >
-              {instagramHandle}
-            </a>
-          </p>
-        )}
-      </div>
-    </div>
-  );
-};
-
 type Product = RouterOutputs["product"]["getAll"][number];
 
 const ProductCard = (props: Product) => {
-  const { name, description, image, price, picancia } = props;
+  const { name, description, image, price, picancia, urlSlug } = props;
   const [count, setCount] = useState(1);
 
   const qntyIncrement = () => {
@@ -165,9 +129,9 @@ const ProductCard = (props: Product) => {
 
   return (
     <div className="flex max-w-xs flex-col space-y-4 p-3">
-      <h2 className="rounded-sm bg-neutral-950 p-2 text-2xl font-bold text-red-600">
+      <Link href={`/produtos/${urlSlug}`} className="rounded-sm bg-neutral-950 p-2 text-2xl font-bold text-red-600">
         {name}
-      </h2>
+      </Link>
       <Image src={image} alt={`${name} image`} width={1080} height={1080} />
       <div className="flex flex-col space-y-3">
         <div className="flex justify-between align-middle">
