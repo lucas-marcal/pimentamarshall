@@ -1,6 +1,8 @@
 import { type AppType } from "next/app";
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
+import { Provider } from "react-redux";
+import store from "../../redux/store";
 
 import { api } from "~/utils/api";
 
@@ -31,10 +33,12 @@ const MyApp: AppType<{ session: Session | null }> = ({
   // }, [Router])
 
   return (
-    <SessionProvider session={session}>
-      {/* {isLoading && <Loading />} */}
-      <Component {...pageProps} />
-    </SessionProvider>
+    <Provider store={store}>
+      <SessionProvider session={session}>
+        {/* {isLoading && <Loading />} */}
+        <Component {...pageProps} />
+      </SessionProvider>
+    </Provider>
   );
 };
 

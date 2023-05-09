@@ -13,6 +13,8 @@ import { createInnerTRPCContext } from "~/server/api/trpc";
 import SuperJSON from "superjson";
 import StoreCard from "~/components/StoreCard";
 import Link from "next/link";
+import { addToCart } from "redux/cart.slice";
+import { useAppDispatch } from "redux/hooks";
 
 const Home = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
   const products = api.product.getAll.useQuery().data;
@@ -96,8 +98,22 @@ export default Home;
 type Product = RouterOutputs["product"]["getAll"][number];
 
 const ProductCard = (props: Product) => {
-  const { name, description, image, price, picancia, urlSlug } = props;
+  const { name, description, image, price, picancia, urlSlug, id } = props;
   const [count, setCount] = useState(1);
+
+  const dispatch = useAppDispatch();
+
+  const addToCartHandle = () => {
+    let cartProduct = {
+      name: name,
+      id: id,
+      image: image,
+      price: price,
+      urlSlug: urlSlug,
+      quantity: count,
+    }
+    dispatch(addToCart(cartProduct))
+  }
 
   const qntyIncrement = () => {
     setCount(count + 1);
@@ -112,6 +128,7 @@ const ProductCard = (props: Product) => {
   };
 
   const getPicancia = () => {
+
     if (!picancia) {
       return null;
     }
@@ -166,7 +183,7 @@ const ProductCard = (props: Product) => {
             +
           </button>
         </div>
-        <button className="rounded-lg bg-white/10 px-7 py-3 font-semibold text-white no-underline transition hover:bg-red-600">
+        <button onClick={addToCartHandle} className="rounded-lg bg-white/10 px-7 py-3 font-semibold text-white no-underline transition hover:bg-red-600">
           <ShoppingCartIcon className="h-5 w-5" />
         </button>
       </div>
