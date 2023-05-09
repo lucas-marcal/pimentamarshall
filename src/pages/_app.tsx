@@ -5,34 +5,34 @@ import { SessionProvider } from "next-auth/react";
 import { api } from "~/utils/api";
 
 import "~/styles/globals.css";
-import Loading from "~/components/Loading";
-import { useEffect, useState } from "react";
-import { Router } from "next/router";
+// import Loading from "~/components/Loading";
+// import { useEffect, useState } from "react";
+// import { Router } from "next/router";
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
   pageProps: { session, ...pageProps },
 }) => {
-  const [isLoading, setIsLoading] = useState(false)
+  // const [isLoading, setIsLoading] = useState(false)
 
-  useEffect(() => {
-    Router.events.on("routeChangeStart", (url)=>{
-      setIsLoading(true)
-    });
+  // useEffect(() => {
+  //   Router.events.on("routeChangeStart", (url)=>{
+  //     setIsLoading(true)
+  //   });
 
-    Router.events.on("routeChangeComplete", (url)=>{
-      setIsLoading(false)
-    });
+  //   Router.events.on("routeChangeComplete", (url)=>{
+  //     setIsLoading(false)
+  //   });
 
-    Router.events.on("routeChangeError", (url) =>{
-      setIsLoading(false)
-    });
+  //   Router.events.on("routeChangeError", (url) =>{
+  //     setIsLoading(false)
+  //   });
 
-  }, [Router])
+  // }, [Router])
 
   return (
     <SessionProvider session={session}>
-      {isLoading && <Loading />}
+      {/* {isLoading && <Loading />} */}
       <Component {...pageProps} />
     </SessionProvider>
   );
