@@ -11,7 +11,18 @@ interface CartProduct {
 
 interface CartState extends Array<CartProduct> {}
 
-const initialState: CartState = [];
+const getCartFromLocalStorage = () => {
+  try { 
+    const persistedState = localStorage.getItem('cart') 
+    if (persistedState) 
+      return JSON.parse(persistedState)
+  }
+  catch (e){ 
+    console.log(e)
+  }
+}
+
+const initialState: CartState = getCartFromLocalStorage() || [];
 
 const cartSlice = createSlice({
   name: "cart",
