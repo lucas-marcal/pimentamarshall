@@ -35,6 +35,7 @@ const Home = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
         <div className="max-w-sm px-5">
           <Image alt="Marshall logo" src={marshallogo} className="max-w-5" />
         </div>
+        <Link href={"/cartPage"}>Cart Page</Link>
         <div className="mx-3 my-5 flex max-w-2xl flex-col space-y-3 rounded-xl border-2 border-red-600 px-6 py-4">
           <p className="text-neutral-50">
             <span className="font-bold text-red-600">
