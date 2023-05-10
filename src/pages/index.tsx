@@ -105,7 +105,7 @@ const ProductCard = (props: Product) => {
   const dispatch = useAppDispatch();
 
   const addToCartHandle = () => {
-    let cartProduct = {
+    const cartProduct = {
       name: name,
       id: id,
       image: image,
