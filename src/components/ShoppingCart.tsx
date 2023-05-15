@@ -47,6 +47,7 @@ const ShoppingCart: React.FC<{
     gia: number;
     ddd: number;
     siafi: number;
+    erro?: boolean;
   }
 
   const fetchCepInfo = async () => {
@@ -61,6 +62,10 @@ const ShoppingCart: React.FC<{
         const res = await axios.get<SingleCepResponse>(
           `https://viacep.com.br/ws/${inputToNumber}/json/`
         );
+
+        if (res.data.erro) {
+            setError(true)
+        }
   
         setCepInfo(res.data);
       } catch (error) {
@@ -72,6 +77,7 @@ const ShoppingCart: React.FC<{
     setError(false);
     setCepInfo(undefined);
     await fetchCepInfo().catch((err) => console.log(err));
+    console.log(cepInfo);
   };
 
   return (
@@ -159,7 +165,7 @@ const ShoppingCart: React.FC<{
                   />
                   <button
                     className="rounded-md bg-lime-400 px-2 text-sm text-neutral-950"
-                    onClick={() => void cepInputHandler}
+                    onClick={() => void cepInputHandler()}
                   >
                     <MagnifyingGlassIcon className="h-4 w-4" />
                   </button>
@@ -176,7 +182,7 @@ const ShoppingCart: React.FC<{
                   </p>
                 </div>
               )}
-              {cepInfo && (
+              {cepInfo?.localidade && (
                 <div className="mb-3 flex flex-col rounded-md border-2 border-neutral-700 p-1 px-3">
                   <p className="mb-1 text-center text-neutral-50">
                     {cepInfo.localidade} - {cepInfo.bairro}
