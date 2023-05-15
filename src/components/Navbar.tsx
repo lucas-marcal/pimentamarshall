@@ -3,7 +3,7 @@ import marshallIcon from "../../public/img/marshall-icn-preto.png";
 import Image from "next/image";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { Dispatch, SetStateAction } from "react";
+import { type Dispatch, type SetStateAction } from "react";
 
 const Navbar: React.FC<{setIsOpen: Dispatch<SetStateAction<boolean>>, isOpen: boolean, itemsQnty: number}> = (props) => {
   const { data: sessionData } = useSession();
