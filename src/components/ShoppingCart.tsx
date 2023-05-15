@@ -36,6 +36,10 @@ const ShoppingCart: React.FC<{
     console.log("CHECKOUT");
   };
 
+  const handleChange = (text: string) => {
+    setCepInput(text)
+  }
+
   interface SingleCepResponse {
     cep: string;
     logradouro: string;
@@ -52,7 +56,7 @@ const ShoppingCart: React.FC<{
 
   const fetchCepInfo = async () => {
     try {
-        const inputWithoutSpaces = cepInput.replace(/\D/g, "");
+        const inputWithoutSpaces = cepInput.replace(/\D/g, "").replace("-","");
         const inputToNumber = Number(inputWithoutSpaces);
   
         if (!/^[0-9]{8}$/.test(inputWithoutSpaces) || isNaN(inputToNumber)) {
@@ -157,11 +161,11 @@ const ShoppingCart: React.FC<{
                 <div className="flex align-middle">
                   <p className="mr-2 self-center leading-none">CEP:</p>
                   <input
-                    type="number"
+                    type="text"
                     name="cep"
                     id="cep"
                     className="mr-2 w-24 rounded-md border border-red-600 bg-neutral-950 px-2 py-1 text-sm text-neutral-50 outline-none [appearance:textfield] focus:outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                    onChange={(e) => setCepInput(e.target.value)}
+                    onChange={(e) => handleChange(e.target.value)}
                   />
                   <button
                     className="rounded-md bg-lime-400 px-2 text-sm text-neutral-950"
