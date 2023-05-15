@@ -19,7 +19,7 @@ const ShoppingCart: React.FC<{
 }> = (props) => {
   const [cepInput, setCepInput] = useState<string>("");
   const [error, setError] = useState(false);
-  const [cepInfo, setCepInfo] = useState<SingleCepResponse>()
+  const [cepInfo, setCepInfo] = useState<SingleCepResponse>();
 
   const { setIsOpen, isOpen, cart } = props;
 
@@ -33,7 +33,7 @@ const ShoppingCart: React.FC<{
   };
 
   const goToCheckout = () => {
-    console.log("CHECKOUT")
+    console.log("CHECKOUT");
   };
 
   interface SingleCepResponse {
@@ -52,18 +52,22 @@ const ShoppingCart: React.FC<{
   const cepInputHandler = async () => {
     setError(false);
     setCepInfo(undefined);
-    const inputWithoutSpaces = cepInput.replace(/\D/g, "");
-    const inputToNumber = Number(inputWithoutSpaces);
+    try {
+      const inputWithoutSpaces = cepInput.replace(/\D/g, "");
+      const inputToNumber = Number(inputWithoutSpaces);
 
-    if (!/^[0-9]{8}$/.test(inputWithoutSpaces) || isNaN(inputToNumber)) {
-      return setError(true);
+      if (!/^[0-9]{8}$/.test(inputWithoutSpaces) || isNaN(inputToNumber)) {
+        return setError(true);
+      }
+
+      const res = await axios.get<SingleCepResponse>(
+        `https://viacep.com.br/ws/${inputToNumber}/json/`
+      );
+
+      setCepInfo(res.data);
+    } catch (error) {
+        console.error('Error fetching data:', error);
     }
-
-    const res = await axios.get<SingleCepResponse>(
-      `https://viacep.com.br/ws/${inputToNumber}/json/`
-    );
-
-    setCepInfo(res.data);
   };
 
   return (
@@ -151,11 +155,7 @@ const ShoppingCart: React.FC<{
                   />
                   <button
                     className="rounded-md bg-lime-400 px-2 text-sm text-neutral-950"
-                    onClick={() => {
-                        (async () => {
-                            await cepInputHandler().catch(err => console.log(err));
-                        })();
-                    }}
+                    onClick={cepInputHandler}
                   >
                     <MagnifyingGlassIcon className="h-4 w-4" />
                   </button>
@@ -172,33 +172,37 @@ const ShoppingCart: React.FC<{
                   </p>
                 </div>
               )}
-              {cepInfo && (<div className="mb-3 flex flex-col rounded-md border-2 border-neutral-700 p-1 px-3">
+              {cepInfo && (
+                <div className="mb-3 flex flex-col rounded-md border-2 border-neutral-700 p-1 px-3">
                   <p className="mb-1 text-center text-neutral-50">
                     {cepInfo.localidade} - {cepInfo.bairro}
                   </p>
-                </div>)}
-              {cepInfo?.localidade === "Belo Horizonte" ? (<div className="mb-3 flex flex-col rounded-md bg-red-600 p-3">
-                <div className="flex justify-between py-1">
-                  <div className="flex gap-3 align-middle">
-                    <input
-                      type="radio"
-                      name="deliveryType"
-                      id="motoboy"
-                      className=""
-                    />
-                    <p className="">Motoboy</p>
-                  </div>
-                  <p>R$ 10</p>
                 </div>
-                <div className="flex justify-between py-1">
-                  <div className="flex gap-3 align-middle">
-                    <input type="radio" name="deliveryType" id="motoboy" />
-                    <p className="">SEDEX</p>
+              )}
+              {cepInfo?.localidade === "Belo Horizonte" ? (
+                <div className="mb-3 flex flex-col rounded-md bg-red-600 p-3">
+                  <div className="flex justify-between py-1">
+                    <div className="flex gap-3 align-middle">
+                      <input
+                        type="radio"
+                        name="deliveryType"
+                        id="motoboy"
+                        className=""
+                      />
+                      <p className="">Motoboy</p>
+                    </div>
+                    <p>R$ 10</p>
                   </div>
-                  <p>R$ 22,50</p>
+                  <div className="flex justify-between py-1">
+                    <div className="flex gap-3 align-middle">
+                      <input type="radio" name="deliveryType" id="motoboy" />
+                      <p className="">SEDEX</p>
+                    </div>
+                    <p>R$ 22,50</p>
+                  </div>
                 </div>
-              </div>) : null}
-              
+              ) : null}
+
               <button
                 onClick={goToCheckout}
                 className="mb-3 rounded-lg bg-white/10 px-7 py-3 font-semibold text-white no-underline transition hover:bg-lime-400 hover:text-neutral-950"
