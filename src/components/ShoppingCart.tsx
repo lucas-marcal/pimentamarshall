@@ -153,7 +153,7 @@ const ShoppingCart: React.FC<{
                     className="rounded-md bg-lime-400 px-2 text-sm text-neutral-950"
                     onClick={() => {
                         (async () => {
-                            await cepInputHandler();
+                            await cepInputHandler().catch(err => console.log(err));
                         })();
                     }}
                   >
