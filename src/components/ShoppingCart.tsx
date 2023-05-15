@@ -49,7 +49,7 @@ const ShoppingCart: React.FC<{
     siafi: number;
   }
 
-  const cepInputHandler = async () => {
+  const cepInputHandler = async (): Promise<void> => {
     setError(false);
     setCepInfo(undefined);
     try {
