@@ -68,10 +68,10 @@ const ShoppingCart: React.FC<{
       }
   }
 
-  const cepInputHandler = () => {
+  const cepInputHandler = async () => {
     setError(false);
     setCepInfo(undefined);
-    fetchCepInfo();
+    await fetchCepInfo().catch((err) => console.log(err));
   };
 
   return (
@@ -159,7 +159,7 @@ const ShoppingCart: React.FC<{
                   />
                   <button
                     className="rounded-md bg-lime-400 px-2 text-sm text-neutral-950"
-                    onClick={cepInputHandler}
+                    onClick={() => void cepInputHandler}
                   >
                     <MagnifyingGlassIcon className="h-4 w-4" />
                   </button>
