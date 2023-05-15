@@ -1,24 +1,61 @@
-import { type InferGetStaticPropsType, GetStaticPropsContext, type NextPage } from "next";
-import { createServerSideHelpers } from '@trpc/react-query/server';
+import {
+  type InferGetStaticPropsType,
+  GetStaticPropsContext,
+  type NextPage,
+} from "next";
+import { createServerSideHelpers } from "@trpc/react-query/server";
 import Head from "next/head";
 import marshallogo from "../../public/img/marshall-logo.png";
 import instagramIcon from "../../public/img/Instagram-icon-white.png";
 import { type RouterOutputs, api } from "~/utils/api";
 import Image from "next/image";
-import { ShoppingCartIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
+import { ShoppingCartIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { useEffect, useState } from "react";
 import Navbar from "~/components/Navbar";
 import { appRouter } from "~/server/api/root";
 import { createInnerTRPCContext } from "~/server/api/trpc";
 import SuperJSON from "superjson";
 import StoreCard from "~/components/StoreCard";
 import Link from "next/link";
-import { addToCart } from "redux/cart.slice";
-import { useAppDispatch } from "redux/hooks";
+import {
+  CartState,
+  addToCart,
+  decrementQuantity,
+  incrementQuantity,
+  removeFromCart,
+} from "redux/cart.slice";
+import { useAppDispatch, useAppSelector } from "redux/hooks";
+import ShoppingCart from "~/components/ShoppingCart";
 
 const Home = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
+  const [cart, setCart] = useState<CartState>([]);
+  const [itemsQnty, setItemsQnty] = useState(0)
+  const [isOpen, setIsOpen] = useState(false);
   const products = api.product.getAll.useQuery().data;
   const resellers = api.reseller.getAll.useQuery().data;
+
+  const currentCart = useAppSelector((state) => state.cart);
+
+  const getItemsQnty = (currentCart: CartState) => {
+    return currentCart.reduce(
+      (accumulator, item) => accumulator + item.quantity,
+      0
+    );
+  }
+
+  useEffect(() => {
+    setCart(currentCart);
+    setItemsQnty(getItemsQnty(currentCart));
+  }, [currentCart]);
+
+  const dispatch = useAppDispatch();
+
+  const getTotalPrice = () => {
+    return cart.reduce(
+      (accumulator, item) => accumulator + item.quantity * item.price,
+      0
+    );
+  };
 
   return (
     <>
@@ -30,12 +67,11 @@ const Home = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Navbar />
-      <main className="relative flex min-h-screen flex-col items-center bg-neutral-900 pb-16 pt-5">
-        <div className="max-w-sm px-5">
-          <Image alt="Marshall logo" src={marshallogo} className="max-w-5" />
+      <Navbar setIsOpen={setIsOpen} isOpen={isOpen} itemsQnty={itemsQnty} />
+      <main className="relative flex min-h-screen flex-col items-center bg-neutral-900 pb-16 pt-5 overscroll-none">
+        <div className="max-w-xs px-5">
+          <Image alt="Marshall logo" src={marshallogo} className="" />
         </div>
-        <Link href={"/cartPage"}>Cart Page</Link>
         <div className="mx-3 my-5 flex max-w-2xl flex-col space-y-3 rounded-xl border-2 border-red-600 px-6 py-4">
           <p className="text-neutral-50">
             <span className="font-bold text-red-600">
@@ -46,7 +82,7 @@ const Home = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
           </p>
           <p className="text-neutral-50">
             <span className="font-bold text-red-600">
-              • Se você não for de Belo Horizonte e quiser a sua Marshall:
+              • Se você <span className="text-lime-400">não for de Belo Horizonte</span> e quiser a sua Marshall:
             </span>{" "}
             entre em contato com a gente pelo instagram{" "}
             <a
@@ -82,14 +118,17 @@ const Home = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
           Onde encontrar a Pimenta Marshall:
         </h2>
         <div className="mx-auto flex max-w-2xl flex-wrap justify-center gap-8">
-          {resellers && resellers.map((reseller) => (
-            <StoreCard key={reseller.id} {...reseller} />
-          ))}
+          {resellers &&
+            resellers.map((reseller) => (
+              <StoreCard key={reseller.id} {...reseller} />
+            ))}
         </div>
       </section>
       <footer className="w-full bg-black py-3 text-center text-xs text-neutral-700">
         Copyright &copy; {new Date().getFullYear()} Pimenta Marshall
       </footer>
+      <ShoppingCart cart={cart} setIsOpen={setIsOpen} isOpen={isOpen} />
+      
     </>
   );
 };
@@ -97,6 +136,17 @@ const Home = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
 export default Home;
 
 type Product = RouterOutputs["product"]["getAll"][number];
+
+interface CartProduct {
+  name: string;
+  id: string;
+  image: string;
+  price: number;
+  urlSlug: string;
+  quantity: number;
+}
+
+
 
 const ProductCard = (props: Product) => {
   const { name, description, image, price, picancia, urlSlug, id } = props;
@@ -112,9 +162,9 @@ const ProductCard = (props: Product) => {
       price: price,
       urlSlug: urlSlug,
       quantity: count,
-    }
-    dispatch(addToCart(cartProduct))
-  }
+    };
+    dispatch(addToCart(cartProduct));
+  };
 
   const qntyIncrement = () => {
     setCount(count + 1);
@@ -129,7 +179,6 @@ const ProductCard = (props: Product) => {
   };
 
   const getPicancia = () => {
-
     if (!picancia) {
       return null;
     }
@@ -147,15 +196,20 @@ const ProductCard = (props: Product) => {
 
   return (
     <div className="flex max-w-xs flex-col space-y-4 p-3">
-      <Link href={`/produtos/${urlSlug}`} className="rounded-sm bg-neutral-950 p-2 text-2xl font-bold text-red-600">
+      <Link
+        href={`/produtos/${urlSlug}`}
+        className="rounded-sm bg-neutral-950 p-2 text-2xl font-bold text-red-600"
+      >
         {name}
       </Link>
       <Image src={image} alt={`${name} image`} width={1080} height={1080} />
       <div className="flex flex-col space-y-3">
         <div className="flex justify-between align-middle">
-        <p className="text-3xl font-bold text-red-600 self-center"><span className="text-2xl font-normal">R$</span> {price.toFixed(2)}</p>
+          <p className="self-center text-3xl font-bold text-red-600">
+            <span className="text-2xl font-normal">R$</span> {price.toFixed(2)}
+          </p>
           <div className="rounded-xl border border-red-600 px-3 py-3">
-            <p className="font-bold text-neutral-700 leading-tight">
+            <p className="font-bold leading-tight text-neutral-700">
               {getPicancia()}
             </p>
           </div>
@@ -176,6 +230,7 @@ const ProductCard = (props: Product) => {
             id="qntyOriginal"
             value={count}
             className="text-md w-7 bg-transparent text-center font-semibold text-gray-50 outline-none [appearance:textfield] focus:outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none "
+            readOnly
           />
           <button
             className="w-8 pb-1 font-bold text-red-600"
@@ -184,7 +239,10 @@ const ProductCard = (props: Product) => {
             +
           </button>
         </div>
-        <button onClick={addToCartHandle} className="rounded-lg bg-white/10 px-7 py-3 font-semibold text-white no-underline transition hover:bg-red-600">
+        <button
+          onClick={addToCartHandle}
+          className="rounded-lg bg-white/10 px-7 py-3 font-semibold text-white no-underline transition hover:bg-red-600"
+        >
           <ShoppingCartIcon className="h-5 w-5" />
         </button>
       </div>
@@ -193,26 +251,22 @@ const ProductCard = (props: Product) => {
 };
 
 export async function getStaticProps() {
-
   const helpers = createServerSideHelpers({
     router: appRouter,
-    ctx: createInnerTRPCContext({session: null }),
+    ctx: createInnerTRPCContext({ session: null }),
     transformer: SuperJSON, // optional - adds superjson serialization
   });
   // const id = context.params?.id as string;
   // prefetch `post.byId`
 
-  await helpers.product.getAll.prefetch()
-  await helpers.reseller.getAll.prefetch()
+  await helpers.product.getAll.prefetch();
+  await helpers.reseller.getAll.prefetch();
 
   return {
-
-    props : { 
+    props: {
       trpcState: helpers.dehydrate(),
-    }
-
-  }
-
+    },
+  };
 }
 
 // const AuthShowcase: React.FC = () => {

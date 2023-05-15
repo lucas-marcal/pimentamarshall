@@ -9,18 +9,18 @@ interface CartProduct {
   quantity: number;
 }
 
-interface CartState extends Array<CartProduct> {}
+export interface CartState extends Array<CartProduct> {}
 
 const getCartFromLocalStorage = () => {
-  try { 
-    const persistedState = localStorage.getItem('cart') 
-    if (persistedState) 
-      return JSON.parse(persistedState)
+  if (typeof window !== "undefined") {
+    try {
+      const persistedState = localStorage.getItem("cart");
+      if (persistedState) return JSON.parse(persistedState);
+    } catch (e) {
+      console.log(e);
+    }
   }
-  catch (e){ 
-    console.log(e)
-  }
-}
+};
 
 const initialState: CartState = getCartFromLocalStorage() || [];
 

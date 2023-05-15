@@ -3,10 +3,11 @@ import marshallIcon from "../../public/img/marshall-icn-preto.png";
 import Image from "next/image";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
+import { Dispatch, SetStateAction } from "react";
 
-const Navbar: React.FC = () => {
+const Navbar: React.FC<{setIsOpen: Dispatch<SetStateAction<boolean>>, isOpen: boolean, itemsQnty: number}> = (props) => {
   const { data: sessionData } = useSession();
-
+  const {setIsOpen, isOpen, itemsQnty} = props;
   return (
     <nav
       className="sticky top-0 z-10 flex justify-center space-x-0 bg-red-600 px-5 align-middle drop-shadow"
@@ -24,8 +25,11 @@ const Navbar: React.FC = () => {
             </button>
           </li>
           <li className="self-center">
-            <button className="group rounded-full bg-neutral-900 p-3 no-underline">
+            <button className="relative group rounded-full bg-neutral-900 p-3 no-underline" onClick={() => {setIsOpen(!isOpen)}}>
               <ShoppingCartIcon className="h-6 w-6 stroke-red-600 transition group-hover:stroke-neutral-50" />
+              {itemsQnty > 0 ? 
+              (<div className="rounded-full bg-neutral-50 h-5 w-5 absolute right-0 bottom-0 text-center text-xs flex align-middle justify-center"><p className="leading-none pt-1">{itemsQnty}</p></div>) : null
+            }
             </button>
           </li>
         </ul>
