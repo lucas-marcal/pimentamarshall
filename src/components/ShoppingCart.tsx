@@ -32,7 +32,9 @@ const ShoppingCart: React.FC<{
     );
   };
 
-  const goToCheckout = () => {};
+  const goToCheckout = () => {
+    console.log("CHECKOUT")
+  };
 
   interface SingleCepResponse {
     cep: string;
@@ -149,7 +151,11 @@ const ShoppingCart: React.FC<{
                   />
                   <button
                     className="rounded-md bg-lime-400 px-2 text-sm text-neutral-950"
-                    onClick={cepInputHandler}
+                    onClick={() => {
+                        (async () => {
+                            await cepInputHandler();
+                        })();
+                    }}
                   >
                     <MagnifyingGlassIcon className="h-4 w-4" />
                   </button>
