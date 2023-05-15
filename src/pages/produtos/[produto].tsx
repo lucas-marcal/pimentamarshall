@@ -10,19 +10,39 @@ import instagramIcon from "../../../public/img/Instagram-icon-white.png";
 import { RouterOutputs, api } from "~/utils/api";
 import Image from "next/image";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "~/components/Navbar";
 import { appRouter } from "~/server/api/root";
 import { createInnerTRPCContext } from "~/server/api/trpc";
 import SuperJSON from "superjson";
 import Link from "next/link";
 import StoreCard from "~/components/StoreCard";
+import { CartState } from "redux/cart.slice";
+import { useAppSelector } from "redux/hooks";
 
 type Product = RouterOutputs["product"]["getAll"][number];
 
 const Produto = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
   const product = api.product.getBySlug.useQuery(props.urlSlug).data as Product;
   const resellers = api.reseller.getAll.useQuery().data;
+
+  const [cart, setCart] = useState<CartState>([]);
+  const [itemsQnty, setItemsQnty] = useState(0)
+  const [isOpen, setIsOpen] = useState(false);
+
+  const currentCart = useAppSelector((state) => state.cart);
+
+  const getItemsQnty = (currentCart: CartState) => {
+    return currentCart.reduce(
+      (accumulator, item) => accumulator + item.quantity,
+      0
+    );
+  }
+
+  useEffect(() => {
+    setCart(currentCart);
+    setItemsQnty(getItemsQnty(currentCart));
+  }, [currentCart]);
 
   return (
     <>
@@ -34,7 +54,7 @@ const Produto = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Navbar />
+      <Navbar setIsOpen={setIsOpen} isOpen={isOpen} itemsQnty={itemsQnty} />
       <main className="relative flex flex-col items-center bg-neutral-900 pb-24 pt-5 px-3">
         <div className="flex flex-col max-w-2xl gap-8">
           <div className="flex flex-wrap">
