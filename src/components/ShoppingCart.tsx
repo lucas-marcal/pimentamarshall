@@ -49,25 +49,29 @@ const ShoppingCart: React.FC<{
     siafi: number;
   }
 
-  const cepInputHandler = async (): Promise<void> => {
+  const fetchCepInfo = async () => {
+    try {
+        const inputWithoutSpaces = cepInput.replace(/\D/g, "");
+        const inputToNumber = Number(inputWithoutSpaces);
+  
+        if (!/^[0-9]{8}$/.test(inputWithoutSpaces) || isNaN(inputToNumber)) {
+          return setError(true);
+        }
+  
+        const res = await axios.get<SingleCepResponse>(
+          `https://viacep.com.br/ws/${inputToNumber}/json/`
+        );
+  
+        setCepInfo(res.data);
+      } catch (error) {
+          console.error('Error fetching data:', error);
+      }
+  }
+
+  const cepInputHandler = () => {
     setError(false);
     setCepInfo(undefined);
-    try {
-      const inputWithoutSpaces = cepInput.replace(/\D/g, "");
-      const inputToNumber = Number(inputWithoutSpaces);
-
-      if (!/^[0-9]{8}$/.test(inputWithoutSpaces) || isNaN(inputToNumber)) {
-        return setError(true);
-      }
-
-      const res = await axios.get<SingleCepResponse>(
-        `https://viacep.com.br/ws/${inputToNumber}/json/`
-      );
-
-      setCepInfo(res.data);
-    } catch (error) {
-        console.error('Error fetching data:', error);
-    }
+    fetchCepInfo();
   };
 
   return (
