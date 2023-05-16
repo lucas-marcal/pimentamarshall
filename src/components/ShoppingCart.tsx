@@ -20,10 +20,26 @@ const ShoppingCart: React.FC<{
   const [cepInput, setCepInput] = useState<string>("");
   const [error, setError] = useState(false);
   const [cepInfo, setCepInfo] = useState<SingleCepResponse>();
+  const [deliveryCost, setDeliveryCost] = useState(0);
 
   const { setIsOpen, isOpen, cart } = props;
 
   const dispatch = useAppDispatch();
+
+  const deliveryChangeHandle = (e: React.ChangeEvent<HTMLInputElement>) => {
+    switch (e.target.value) {
+        case "Motoboy":
+            setDeliveryCost(10);
+            break;
+        
+        case "Sedex":
+            setDeliveryCost(22.50);
+            break;
+    
+        default:
+            break;
+    }
+  }
 
   const getTotalPrice = () => {
     return cart.reduce(
@@ -37,8 +53,8 @@ const ShoppingCart: React.FC<{
   };
 
   const handleChange = (text: string) => {
-    setCepInput(text)
-  }
+    setCepInput(text);
+  };
 
   interface SingleCepResponse {
     cep: string;
@@ -56,32 +72,32 @@ const ShoppingCart: React.FC<{
 
   const fetchCepInfo = async () => {
     try {
-        const inputWithoutSpaces = cepInput.replace(/\D/g, "").replace("-","");
-        const inputToNumber = Number(inputWithoutSpaces);
-  
-        if (!/^[0-9]{8}$/.test(inputWithoutSpaces) || isNaN(inputToNumber)) {
-          return setError(true);
-        }
-  
-        const res = await axios.get<SingleCepResponse>(
-          `https://viacep.com.br/ws/${inputToNumber}/json/`
-        );
+      const inputWithoutSpaces = cepInput.replace(/\D/g, "").replace("-", "");
+      const inputToNumber = Number(inputWithoutSpaces);
 
-        if (res.data.erro) {
-            setError(true)
-        }
-  
-        setCepInfo(res.data);
-      } catch (error) {
-          console.error('Error fetching data:', error);
+      if (!/^[0-9]{8}$/.test(inputWithoutSpaces) || isNaN(inputToNumber)) {
+        return setError(true);
       }
-  }
+
+      const res = await axios.get<SingleCepResponse>(
+        `https://viacep.com.br/ws/${inputToNumber}/json/`
+      );
+
+      if (res.data.erro) {
+        setError(true);
+      }
+
+      setCepInfo(res.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
   const cepInputHandler = async () => {
+    setDeliveryCost(0);
     setError(false);
     setCepInfo(undefined);
     await fetchCepInfo().catch((err) => console.log(err));
-    console.log(cepInfo);
   };
 
   return (
@@ -176,7 +192,7 @@ const ShoppingCart: React.FC<{
                 </div>
 
                 <p className="self-center text-center leading-none ">
-                  <span className="font-bold">Total:</span> R$ {getTotalPrice()}
+                  <span className="font-bold">Total:</span> R$ {(getTotalPrice() + deliveryCost).toFixed(2).replace(".",",")}
                 </p>
               </div>
               {error && (
@@ -193,6 +209,23 @@ const ShoppingCart: React.FC<{
                   </p>
                 </div>
               )}
+              {cepInfo?.localidade &&
+              cepInfo?.localidade !== "Belo Horizonte" ? (
+                <div className="mb-3 flex flex-col rounded-md bg-red-600 p-3">
+                  <p className="mb-1 text-center text-neutral-50">
+                    Infelizmente o frete está indisponível para a sua
+                    localidade. Mande uma DM no nosso instagram{" "}
+                    <a
+                      href="https://www.instagram.com/pimentamarshall/"
+                      className="text-neutral-900 transition hover:text-neutral-50"
+                      target="_blank"
+                    >
+                      @pimentamarshall
+                    </a>{" "}
+                    para ver como podemos realizar a sua entrega!
+                  </p>
+                </div>
+              ) : null}
               {cepInfo?.localidade === "Belo Horizonte" ? (
                 <div className="mb-3 flex flex-col rounded-md bg-red-600 p-3">
                   <div className="flex justify-between py-1">
@@ -201,7 +234,9 @@ const ShoppingCart: React.FC<{
                         type="radio"
                         name="deliveryType"
                         id="motoboy"
+                        value="Motoboy"
                         className=""
+                        onChange={deliveryChangeHandle}
                       />
                       <p className="">Motoboy</p>
                     </div>
@@ -209,7 +244,7 @@ const ShoppingCart: React.FC<{
                   </div>
                   <div className="flex justify-between py-1">
                     <div className="flex gap-3 align-middle">
-                      <input type="radio" name="deliveryType" id="motoboy" />
+                      <input type="radio" name="deliveryType" id="sedex" value="Sedex" onChange={deliveryChangeHandle} />
                       <p className="">SEDEX</p>
                     </div>
                     <p>R$ 22,50</p>
