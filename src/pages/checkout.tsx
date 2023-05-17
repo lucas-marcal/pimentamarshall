@@ -9,6 +9,7 @@ const Checkout = () => {
 
   const currentCart = useAppSelector((state) => state.cart);
   const address = useAppSelector((state) => state.address);
+  const shipping = useAppSelector((state) => state.shipping);
 
   useEffect(() => {
     setCart(currentCart);
@@ -20,6 +21,13 @@ const Checkout = () => {
 
   const paymentHandle = () => {
     console.log("GO TO PAYMENT");
+  };
+
+  const getTotalPrice = () => {
+    return cart.reduce(
+      (accumulator, item) => accumulator + item.quantity * item.price,
+      0
+    );
   };
 
   return (
@@ -215,11 +223,11 @@ const Checkout = () => {
               <div className="min-h-24 flex justify-between space-x-3 p-3 align-middle">
                 <div className="flex gap-3 align-middle">
                   <p className="font-bold">Frete:</p>
-                  <p>Motoboy</p>
+                  <p>{shipping.type}</p>
                 </div>
                 <div className="flex justify-between space-x-3">
                   <p className="m-0 self-center p-0 text-sm leading-none">
-                    R$ 10,00
+                    R$ {shipping.price.toFixed(2).replace(".", ",")}
                   </p>
                 </div>
               </div>
@@ -227,7 +235,9 @@ const Checkout = () => {
             <div className="mb-6 flex w-full flex-col rounded-b-md bg-red-600 p-3 px-5 text-neutral-50">
               <p className="text-right text-lg">
                 {" "}
-                <span className="font-bold">Total:</span> R$125,00{" "}
+                <span className="font-bold">Total:</span> R$ {(getTotalPrice() + shipping.price)
+                    .toFixed(2)
+                    .replace(".", ",")}
               </p>
             </div>
           </div>
@@ -276,33 +286,3 @@ const Checkout = () => {
 };
 
 export default Checkout;
-
-const stateSelectOptions = [
-  "AC",
-  "AL",
-  "AP",
-  "AM",
-  "BA",
-  "CE",
-  "DF",
-  "ES",
-  "GO",
-  "MA",
-  "MT",
-  "MS",
-  "MG",
-  "PA",
-  "PB",
-  "PR",
-  "PE",
-  "PI",
-  "RJ",
-  "RN",
-  "RS",
-  "RO",
-  "RR",
-  "SC",
-  "SP",
-  "SE",
-  "TO",
-];

@@ -8,6 +8,7 @@ import {
 } from "./cart.slice";
 import { listenerMiddleware, startAppListening } from "./listenerMiddleware";
 import { addressReducer, setAddress } from "./address.slice";
+import { setShipping, shippingReducer } from "./shipping.slice";
 
 startAppListening({
   matcher: isAnyOf(
@@ -28,9 +29,17 @@ startAppListening({
   },
 });
 
+startAppListening({
+  actionCreator: setShipping,
+  effect: async (action, listenerApi) => {
+    localStorage.setItem("shipping", JSON.stringify(listenerApi.getState().shipping));
+  },
+});
+
 const reducer = {
   cart: cartReducer,
   address: addressReducer,
+  shipping: shippingReducer,
 };
 
 const store = configureStore({

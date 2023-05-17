@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useState } from "react";
-import { useAppDispatch } from "redux/hooks";
+import { useAppDispatch, useAppSelector } from "redux/hooks";
 import {
   CartState,
   decrementQuantity,
@@ -7,10 +7,11 @@ import {
   removeFromCart,
 } from "redux/cart.slice";
 import Image from "next/image";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { MagnifyingGlassIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
 import { setAddress } from "redux/address.slice";
 import Router from "next/router";
+import { setShipping } from "redux/shipping.slice";
 
 const ShoppingCart: React.FC<{
   setIsOpen: Dispatch<SetStateAction<boolean>>;
@@ -19,21 +20,23 @@ const ShoppingCart: React.FC<{
 }> = (props) => {
   const [cepInput, setCepInput] = useState<string>("");
   const [error, setError] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
   const [cepInfo, setCepInfo] = useState<SingleCepResponse>();
-  const [deliveryCost, setDeliveryCost] = useState(0);
 
   const { setIsOpen, isOpen, cart } = props;
 
   const dispatch = useAppDispatch();
 
+  const shipping = useAppSelector((state) => state.shipping)
+
   const deliveryChangeHandle = (e: React.ChangeEvent<HTMLInputElement>) => {
     switch (e.target.value) {
       case "Motoboy":
-        setDeliveryCost(10);
+        dispatch(setShipping({type: "Motoboy", price: 10}))
         break;
 
       case "Sedex":
-        setDeliveryCost(22.5);
+        dispatch(setShipping({type: "SEDEX", price: 22.5}))
         break;
 
       default:
@@ -50,6 +53,13 @@ const ShoppingCart: React.FC<{
 
   const goToCheckout = () => {
     if (!cepInfo) {
+      setError(true);
+      setErrorMsg("É necessário inserir um CEP válido!")
+      return null;
+    }
+    if (shipping.type === "") {
+      setError(true);
+      setErrorMsg("Escolha uma forma de entrega!")
       return null;
     }
     dispatch(setAddress(cepInfo));
@@ -80,7 +90,9 @@ const ShoppingCart: React.FC<{
       const inputToNumber = Number(inputWithoutSpaces);
 
       if (!/^[0-9]{8}$/.test(inputWithoutSpaces) || isNaN(inputToNumber)) {
-        return setError(true);
+        setError(true);
+        setErrorMsg("CEP inválido!")
+        return null;
       }
 
       const res = await axios.get<SingleCepResponse>(
@@ -89,6 +101,7 @@ const ShoppingCart: React.FC<{
 
       if (res.data.erro) {
         setError(true);
+        setErrorMsg("CEP não encontrado!")
       }
 
       setCepInfo(res.data);
@@ -98,7 +111,7 @@ const ShoppingCart: React.FC<{
   };
 
   const cepInputHandler = async () => {
-    setDeliveryCost(0);
+    dispatch(setShipping({type: "", price: 0}));
     setError(false);
     setCepInfo(undefined);
     await fetchCepInfo().catch((err) => console.log(err));
@@ -177,7 +190,7 @@ const ShoppingCart: React.FC<{
               </div>
             ))}
             <div className="flex flex-col px-3 align-bottom">
-              <div className="mb-3 flex justify-between px-3 align-middle">
+              <div className="mb-3 flex justify-end align-middle">
                 <div className="flex align-middle">
                   <p className="mr-2 self-center leading-none">CEP:</p>
                   <input
@@ -195,21 +208,7 @@ const ShoppingCart: React.FC<{
                     <MagnifyingGlassIcon className="h-4 w-4" />
                   </button>
                 </div>
-
-                <p className="self-center text-center leading-none ">
-                  <span className="font-bold">Total:</span> R${" "}
-                  {(getTotalPrice() + deliveryCost)
-                    .toFixed(2)
-                    .replace(".", ",")}
-                </p>
               </div>
-              {error && (
-                <div className="mb-3 flex flex-col rounded-md bg-red-600 p-3">
-                  <p className="mb-2 text-center text-neutral-950">
-                    CEP inválido!
-                  </p>
-                </div>
-              )}
               {cepInfo?.localidade && (
                 <div className="mb-3 flex flex-col rounded-md border-2 border-neutral-700 p-1 px-3">
                   <p className="mb-1 text-center text-neutral-50">
@@ -265,12 +264,21 @@ const ShoppingCart: React.FC<{
                   </div>
                 </div>
               ) : null}
-
+              {error && (
+                <div className="mb-2 flex rounded-md p-2 justify-center align-middle gap-1">
+                  <ExclamationCircleIcon className="w-6 h-6 shrink-0 text-red-600"/>
+                  <p className="text-center text-red-600 leading-tight">
+                    {errorMsg}
+                  </p>
+                </div>
+              )}
               <button
                 onClick={goToCheckout}
                 className="mb-3 rounded-lg bg-white/10 px-7 py-3 font-semibold text-white no-underline transition hover:bg-lime-400 hover:text-neutral-950"
               >
-                Finalizar a compra
+                Finalizar a compra <span className="font-normal">&#40;R$ {(getTotalPrice() + shipping.price)
+                    .toFixed(2)
+                    .replace(".", ",")}&#41;</span>
               </button>
             </div>
           </>
@@ -279,17 +287,5 @@ const ShoppingCart: React.FC<{
     </div>
   );
 };
-
-// const checkCep = (cep: number) => {
-//   const getCepInfo = async (cep: number) => {
-//     const res = await axios.get<SingleCepResponse>(
-//       `https://viacep.com.br/ws/${cep}/json/`
-//     );
-
-//     const cepInfo = res.data;
-
-//     return cepInfo;
-//   };
-// };
 
 export default ShoppingCart;
