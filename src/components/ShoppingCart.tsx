@@ -51,7 +51,7 @@ const ShoppingCart: React.FC<{
     );
   };
 
-  const goToCheckout = () => {
+  const goToCheckout = async () => {
     try {
       if (!cepInfo) {
         setError(true);
@@ -64,7 +64,7 @@ const ShoppingCart: React.FC<{
         return null;
       }
       dispatch(setAddress(cepInfo));
-      Router.push("/checkout");
+      await Router.push("/checkout");
     } catch (error) {
       console.log(error)
     }
