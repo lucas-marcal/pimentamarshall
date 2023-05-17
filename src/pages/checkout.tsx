@@ -1,4 +1,5 @@
 import Head from "next/head";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { CartState } from "redux/cart.slice";
 import { useAppSelector } from "redux/hooks";
@@ -13,6 +14,14 @@ const Checkout = () => {
     setCart(currentCart);
   }, [currentCart]);
 
+  const paymentMethodHandle = () => {
+    console.log("METHOD CHANGED");
+  };
+
+  const paymentHandle = () => {
+    console.log("GO TO PAYMENT");
+  };
+
   return (
     <>
       <Head>
@@ -24,13 +33,13 @@ const Checkout = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="relative flex min-h-screen flex-col items-center overscroll-none bg-neutral-900 pb-16 pt-5">
-        <div className="flex max-w-2xl flex-wrap justify-center gap-6 px-3">
-            <div className="w-full">
-          <h1 className="text-left uppercase rounded-sm bg-neutral-950 p-2 px-3 text-2xl font-bold text-red-600 inline-block">
-            Dados para a entrega:
-          </h1>
+        <div className="flex max-w-2xl flex-col gap-4 px-3">
+          <div className="w-full">
+            <h1 className="inline-block rounded-sm bg-neutral-950 p-2 px-3 text-left text-2xl font-bold uppercase text-lime-400">
+              Dados para a entrega:
+            </h1>
           </div>
-          <form className="w-full">
+          <form className="w-full mb-4">
             <div className="-mx-3 mb-5 flex flex-wrap">
               <div className="mb-3 w-full px-3 md:mb-0 md:w-1/2">
                 <label
@@ -40,7 +49,7 @@ const Checkout = () => {
                   Nome
                 </label>
                 <input
-                  className="block w-full appearance-none rounded border border-neutral-500 bg-neutral-950 px-4 py-3 leading-tight text-neutral-50 focus:bg-neutral-900 focus:border-neutral-100 focus:outline-none placeholder:text-neutral-700"
+                  className="block w-full appearance-none rounded border border-neutral-500 bg-neutral-950 px-4 py-3 leading-tight text-neutral-50 placeholder:text-neutral-700 focus:border-neutral-100 focus:bg-neutral-900 focus:outline-none"
                   id="grid-first-name"
                   type="text"
                   placeholder="Jorge"
@@ -57,7 +66,7 @@ const Checkout = () => {
                   Sobrenome
                 </label>
                 <input
-                  className="block w-full appearance-none rounded border border-neutral-500 bg-neutral-950 px-4 py-3 leading-tight text-neutral-50 focus:bg-neutral-900 focus:border-neutral-100 focus:outline-none placeholder:text-neutral-700"
+                  className="block w-full appearance-none rounded border border-neutral-500 bg-neutral-950 px-4 py-3 leading-tight text-neutral-50 placeholder:text-neutral-700 focus:border-neutral-100 focus:bg-neutral-900 focus:outline-none"
                   id="grid-last-name"
                   type="text"
                   placeholder="Ben Jor"
@@ -73,7 +82,7 @@ const Checkout = () => {
                   Endereço
                 </label>
                 <input
-                  className="mb-3 block w-full appearance-none rounded border border-neutral-500 bg-neutral-950 px-4 py-3 leading-tight text-neutral-50 focus:bg-neutral-900 focus:border-neutral-100 focus:outline-none placeholder:text-neutral-700"
+                  className="mb-3 block w-full appearance-none rounded border border-neutral-500 bg-neutral-950 px-4 py-3 leading-tight text-neutral-50 placeholder:text-neutral-700 focus:border-neutral-100 focus:bg-neutral-900 focus:outline-none"
                   id="grid-first-name"
                   type="text"
                   placeholder="Rua, Av..."
@@ -88,7 +97,7 @@ const Checkout = () => {
                   Número
                 </label>
                 <input
-                  className="mb-3 block w-full appearance-none rounded border border-neutral-500 bg-neutral-950 px-4 py-3 leading-tight text-neutral-50 focus:bg-neutral-900 focus:border-neutral-100 focus:outline-none placeholder:text-neutral-700"
+                  className="mb-3 block w-full appearance-none rounded border border-neutral-500 bg-neutral-950 px-4 py-3 leading-tight text-neutral-50 placeholder:text-neutral-700 focus:border-neutral-100 focus:bg-neutral-900 focus:outline-none"
                   id="grid-last-name"
                   type="text"
                 />
@@ -101,7 +110,7 @@ const Checkout = () => {
                   Complemento
                 </label>
                 <input
-                  className="mb-3 block w-full appearance-none rounded border border-neutral-500 bg-neutral-950 px-4 py-3 leading-tight text-neutral-50 focus:bg-neutral-900 focus:border-neutral-100 focus:outline-none placeholder:text-neutral-700"
+                  className="mb-3 block w-full appearance-none rounded border border-neutral-500 bg-neutral-950 px-4 py-3 leading-tight text-neutral-50 placeholder:text-neutral-700 focus:border-neutral-100 focus:bg-neutral-900 focus:outline-none"
                   id="grid-last-name"
                   type="text"
                 />
@@ -116,7 +125,7 @@ const Checkout = () => {
                   Cidade
                 </label>
                 <input
-                  className="block w-full appearance-none rounded border border-neutral-500 bg-neutral-950 px-4 py-3 leading-tight text-neutral-50 focus:bg-neutral-900 focus:border-neutral-100 focus:outline-none placeholder:text-neutral-700"
+                  className="block w-full appearance-none rounded border border-neutral-500 bg-neutral-950 px-4 py-3 leading-tight text-neutral-50 placeholder:text-neutral-700 focus:border-neutral-100 focus:bg-neutral-900 focus:outline-none"
                   id="grid-city"
                   type="text"
                   placeholder="Belo Horizonte"
@@ -132,16 +141,16 @@ const Checkout = () => {
                 </label>
                 <div className="relative">
                   <input
-                    className="block w-full appearance-none rounded border border-neutral-500 bg-neutral-950 px-4 py-3 leading-tight text-neutral-50 focus:border-neutral-100 focus:bg-neutral-900 focus:outline-none placeholder:text-neutral-700"
+                    className="block w-full appearance-none rounded border border-neutral-500 bg-neutral-950 px-4 py-3 leading-tight text-neutral-50 placeholder:text-neutral-700 focus:border-neutral-100 focus:bg-neutral-900 focus:outline-none"
                     id="grid-state"
                     type="text"
                     maxLength={2}
                     defaultValue={address.uf}
-                    placeholder="MG, PE, AC, RS, etc.."
+                    placeholder="UF"
                   />
                 </div>
               </div>
-              <div className="mb-6 w-full px-3 md:mb-0 md:w-5/12">
+              <div className="w-full px-3 md:mb-0 md:w-5/12">
                 <label
                   className="mb-2 block text-xs font-bold uppercase tracking-wide text-red-600"
                   htmlFor="grid-zip"
@@ -149,7 +158,7 @@ const Checkout = () => {
                   CEP
                 </label>
                 <input
-                  className="block w-full appearance-none rounded border border-neutral-500 bg-neutral-950 px-4 py-3 leading-tight text-neutral-50 focus:bg-neutral-900 focus:border-neutral-100 focus:outline-none placeholder:text-neutral-700"
+                  className="block w-full appearance-none rounded border border-neutral-500 bg-neutral-950 px-4 py-3 leading-tight text-neutral-50 placeholder:text-neutral-700 focus:border-neutral-100 focus:bg-neutral-900 focus:outline-none"
                   id="grid-zip"
                   type="text"
                   placeholder="30190-922"
@@ -158,7 +167,109 @@ const Checkout = () => {
               </div>
             </div>
           </form>
+          <div className="w-full">
+            <h1 className="inline-block rounded-sm bg-neutral-950 p-2 px-3 text-left text-2xl font-bold uppercase text-lime-400">
+              Resumo do pedido:
+            </h1>
+          </div>
+          <div className="w-full">
+            <div className="flex w-full flex-col rounded-t-md bg-neutral-950 p-2 text-neutral-50">
+              {cart.map((item) => (
+                <div
+                  className="min-h-24 flex justify-between space-x-3 p-3 align-middle"
+                  key={item.id}
+                >
+                  <div className="flex gap-3 align-middle">
+                    <p className="m-0 self-center p-0 text-sm font-bold leading-none">
+                      {item.quantity} <span className="font-normal">x</span>
+                    </p>
+                    <div className="shrink-0 self-center">
+                      <Image
+                        alt={`Imagem do produto ${item.name}`}
+                        src={item.image}
+                        height={50}
+                        width={50}
+                        className=""
+                      />
+                    </div>
+                    <div className="flex flex-col justify-evenly gap-2">
+                      <p className="m-0 p-0 text-sm font-bold leading-none">
+                        {item.name}
+                      </p>
+                      <p className="m-0 p-0 text-sm leading-none">
+                        R$ {item.price.toFixed(2).replace(".", ",")}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between space-x-3">
+                    <p className="m-0 self-center p-0 text-sm leading-none">
+                      R$
+                      {(item.price * item.quantity)
+                        .toFixed(2)
+                        .replace(".", ",")}
+                    </p>
+                  </div>
+                </div>
+              ))}
+              <div className="min-h-24 flex justify-between space-x-3 p-3 align-middle">
+                <div className="flex gap-3 align-middle">
+                  <p className="font-bold">Frete:</p>
+                  <p>Motoboy</p>
+                </div>
+                <div className="flex justify-between space-x-3">
+                  <p className="m-0 self-center p-0 text-sm leading-none">
+                    R$ 10,00
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="mb-6 flex w-full flex-col rounded-b-md bg-red-600 p-3 px-5 text-neutral-50">
+              <p className="text-right text-lg">
+                {" "}
+                <span className="font-bold">Total:</span> R$125,00{" "}
+              </p>
+            </div>
+          </div>
+          <div className="w-full">
+            <h1 className="inline-block rounded-sm bg-neutral-950 p-2 px-3 text-left text-2xl font-bold uppercase text-lime-400">
+              Método de pagamento:
+            </h1>
+          </div>
+          <div className="w-full">
+            <div className="mb-4 flex w-full flex-col rounded-md border-2 border-red-600 bg-neutral-950 p-2 text-neutral-50">
+              <div className="min-h-24 flex space-x-3 p-3 align-middle">
+                <input
+                  type="radio"
+                  name="paymentType"
+                  id="pix"
+                  value="Pix"
+                  className=""
+                  onChange={paymentMethodHandle}
+                />
+                <label htmlFor="pix">PIX</label>
+              </div>
+              <div className="min-h-24 flex space-x-3 p-3 align-middle">
+                <input
+                  type="radio"
+                  name="paymentType"
+                  id="pagseguro"
+                  value="PagSeguro"
+                  className=""
+                  onChange={paymentMethodHandle}
+                />
+                <label htmlFor="pagseguro">PagSeguro</label>
+              </div>
+            </div>
+          </div>
+          <button
+          onClick={paymentHandle}
+          className="w-full self-end rounded-lg bg-white/10 px-7 py-3 font-semibold text-white no-underline transition hover:bg-lime-400 hover:text-neutral-950 md:w-fit"
+        >
+          Confirmar compra
+        </button>
         </div>
+        
       </main>
     </>
   );
@@ -166,5 +277,32 @@ const Checkout = () => {
 
 export default Checkout;
 
-
-const stateSelectOptions = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"]
+const stateSelectOptions = [
+  "AC",
+  "AL",
+  "AP",
+  "AM",
+  "BA",
+  "CE",
+  "DF",
+  "ES",
+  "GO",
+  "MA",
+  "MT",
+  "MS",
+  "MG",
+  "PA",
+  "PB",
+  "PR",
+  "PE",
+  "PI",
+  "RJ",
+  "RN",
+  "RS",
+  "RO",
+  "RR",
+  "SC",
+  "SP",
+  "SE",
+  "TO",
+];

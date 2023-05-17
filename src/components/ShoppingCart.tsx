@@ -186,6 +186,7 @@ const ShoppingCart: React.FC<{
                     id="cep"
                     className="mr-2 w-24 rounded-md border border-red-600 bg-neutral-950 px-2 py-1 text-sm text-neutral-50 outline-none [appearance:textfield] focus:outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                     onChange={(e) => handleChange(e.target.value)}
+                    onKeyDown={(e) => e.code === "Enter" || e.code === "NumpadEnter" ? void cepInputHandler() : null}
                   />
                   <button
                     className="rounded-md bg-lime-400 px-2 text-sm text-neutral-950"
@@ -245,7 +246,7 @@ const ShoppingCart: React.FC<{
                         className=""
                         onChange={deliveryChangeHandle}
                       />
-                      <p className="">Motoboy</p>
+                      <label htmlFor="motoboy">Motoboy</label>
                     </div>
                     <p>R$ 10</p>
                   </div>
@@ -258,7 +259,7 @@ const ShoppingCart: React.FC<{
                         value="Sedex"
                         onChange={deliveryChangeHandle}
                       />
-                      <p className="">SEDEX</p>
+                      <label htmlFor="sedex">SEDEX</label>
                     </div>
                     <p>R$ 22,50</p>
                   </div>
