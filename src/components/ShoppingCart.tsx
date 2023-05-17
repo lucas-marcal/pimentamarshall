@@ -52,18 +52,22 @@ const ShoppingCart: React.FC<{
   };
 
   const goToCheckout = () => {
-    if (!cepInfo) {
-      setError(true);
-      setErrorMsg("É necessário inserir um CEP válido!")
-      return null;
+    try {
+      if (!cepInfo) {
+        setError(true);
+        setErrorMsg("É necessário inserir um CEP válido!")
+        return null;
+      }
+      if (shipping.type === "") {
+        setError(true);
+        setErrorMsg("Escolha uma forma de entrega!")
+        return null;
+      }
+      dispatch(setAddress(cepInfo));
+      Router.push("/checkout");
+    } catch (error) {
+      console.log(error)
     }
-    if (shipping.type === "") {
-      setError(true);
-      setErrorMsg("Escolha uma forma de entrega!")
-      return null;
-    }
-    dispatch(setAddress(cepInfo));
-    Router.push("/checkout");
   };
 
   const handleChange = (text: string) => {
