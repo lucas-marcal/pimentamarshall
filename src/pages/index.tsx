@@ -1,7 +1,5 @@
 import {
   type InferGetStaticPropsType,
-  GetStaticPropsContext,
-  type NextPage,
 } from "next";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import Head from "next/head";
@@ -20,9 +18,6 @@ import Link from "next/link";
 import {
   CartState,
   addToCart,
-  decrementQuantity,
-  incrementQuantity,
-  removeFromCart,
 } from "redux/cart.slice";
 import { useAppDispatch, useAppSelector } from "redux/hooks";
 import ShoppingCart from "~/components/ShoppingCart";
@@ -47,15 +42,6 @@ const Home = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
     setCart(currentCart);
     setItemsQnty(getItemsQnty(currentCart));
   }, [currentCart]);
-
-  const dispatch = useAppDispatch();
-
-  const getTotalPrice = () => {
-    return cart.reduce(
-      (accumulator, item) => accumulator + item.quantity * item.price,
-      0
-    );
-  };
 
   return (
     <>

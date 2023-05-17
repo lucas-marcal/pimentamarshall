@@ -1,7 +1,6 @@
 import {
   InferGetStaticPropsType,
   GetStaticPropsContext,
-  type NextPage,
   GetStaticPaths,
 } from "next";
 import { createServerSideHelpers } from "@trpc/react-query/server";
@@ -17,8 +16,9 @@ import { createInnerTRPCContext } from "~/server/api/trpc";
 import SuperJSON from "superjson";
 import Link from "next/link";
 import StoreCard from "~/components/StoreCard";
-import { CartState } from "redux/cart.slice";
-import { useAppSelector } from "redux/hooks";
+import { CartState, addToCart } from "redux/cart.slice";
+import { useAppDispatch, useAppSelector } from "redux/hooks";
+import ShoppingCart from "~/components/ShoppingCart";
 
 type Product = RouterOutputs["product"]["getAll"][number];
 
@@ -90,6 +90,7 @@ const Produto = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
       <footer className="w-full bg-black py-3 text-center text-xs text-neutral-700">
         Copyright &copy; {new Date().getFullYear()} Pimenta Marshall
       </footer>
+      <ShoppingCart cart={cart} setIsOpen={setIsOpen} isOpen={isOpen} />
     </>
   );
 };
@@ -97,8 +98,22 @@ const Produto = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
 export default Produto;
 
 const ProductPanel = (props: Product) => {
-  const { name, id, description, image, price, picancia } = props;
+  const { name, id, description, image, price, picancia, urlSlug } = props;
   const [count, setCount] = useState(1);
+
+  const dispatch = useAppDispatch();
+
+  const addToCartHandle = () => {
+    const cartProduct = {
+      name: name,
+      id: id,
+      image: image,
+      price: price,
+      urlSlug: urlSlug,
+      quantity: count,
+    };
+    dispatch(addToCart(cartProduct));
+  };
 
   const qntyIncrement = () => {
     setCount(count + 1);
@@ -173,7 +188,7 @@ const ProductPanel = (props: Product) => {
               +
             </button>
           </div>
-          <button className="rounded-lg bg-white/10 px-7 py-3 font-semibold text-white no-underline transition hover:bg-red-600">
+          <button onClick={addToCartHandle} className="rounded-lg bg-white/10 px-7 py-3 font-semibold text-white no-underline transition hover:bg-red-600">
             <ShoppingCartIcon className="h-5 w-5" />
           </button>
         </div>

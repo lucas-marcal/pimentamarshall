@@ -2,15 +2,15 @@ import { Dispatch, SetStateAction, useState } from "react";
 import { useAppDispatch } from "redux/hooks";
 import {
   CartState,
-  addToCart,
   decrementQuantity,
   incrementQuantity,
   removeFromCart,
 } from "redux/cart.slice";
 import Image from "next/image";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { setAddress } from "redux/address.slice";
+import Router from "next/router";
 
 const ShoppingCart: React.FC<{
   setIsOpen: Dispatch<SetStateAction<boolean>>;
@@ -28,18 +28,18 @@ const ShoppingCart: React.FC<{
 
   const deliveryChangeHandle = (e: React.ChangeEvent<HTMLInputElement>) => {
     switch (e.target.value) {
-        case "Motoboy":
-            setDeliveryCost(10);
-            break;
-        
-        case "Sedex":
-            setDeliveryCost(22.50);
-            break;
-    
-        default:
-            break;
+      case "Motoboy":
+        setDeliveryCost(10);
+        break;
+
+      case "Sedex":
+        setDeliveryCost(22.5);
+        break;
+
+      default:
+        break;
     }
-  }
+  };
 
   const getTotalPrice = () => {
     return cart.reduce(
@@ -49,7 +49,11 @@ const ShoppingCart: React.FC<{
   };
 
   const goToCheckout = () => {
-    console.log("CHECKOUT");
+    if (!cepInfo) {
+      return null;
+    }
+    dispatch(setAddress(cepInfo));
+    Router.push("/checkout");
   };
 
   const handleChange = (text: string) => {
@@ -192,7 +196,10 @@ const ShoppingCart: React.FC<{
                 </div>
 
                 <p className="self-center text-center leading-none ">
-                  <span className="font-bold">Total:</span> R$ {(getTotalPrice() + deliveryCost).toFixed(2).replace(".",",")}
+                  <span className="font-bold">Total:</span> R${" "}
+                  {(getTotalPrice() + deliveryCost)
+                    .toFixed(2)
+                    .replace(".", ",")}
                 </p>
               </div>
               {error && (
@@ -244,7 +251,13 @@ const ShoppingCart: React.FC<{
                   </div>
                   <div className="flex justify-between py-1">
                     <div className="flex gap-3 align-middle">
-                      <input type="radio" name="deliveryType" id="sedex" value="Sedex" onChange={deliveryChangeHandle} />
+                      <input
+                        type="radio"
+                        name="deliveryType"
+                        id="sedex"
+                        value="Sedex"
+                        onChange={deliveryChangeHandle}
+                      />
                       <p className="">SEDEX</p>
                     </div>
                     <p>R$ 22,50</p>
