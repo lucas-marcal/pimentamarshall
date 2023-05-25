@@ -23,25 +23,9 @@ import { useAppDispatch, useAppSelector } from "redux/hooks";
 import ShoppingCart from "~/components/ShoppingCart";
 
 const Home = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
-  const [cart, setCart] = useState<CartState>([]);
-  const [itemsQnty, setItemsQnty] = useState(0)
   const [isOpen, setIsOpen] = useState(false);
   const products = api.product.getAll.useQuery().data;
   const resellers = api.reseller.getAll.useQuery().data;
-
-  const currentCart = useAppSelector((state) => state.cart);
-
-  const getItemsQnty = (currentCart: CartState) => {
-    return currentCart.reduce(
-      (accumulator, item) => accumulator + item.quantity,
-      0
-    );
-  }
-
-  useEffect(() => {
-    setCart(currentCart);
-    setItemsQnty(getItemsQnty(currentCart));
-  }, [currentCart]);
 
   return (
     <>
@@ -53,7 +37,7 @@ const Home = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Navbar setIsOpen={setIsOpen} isOpen={isOpen} itemsQnty={itemsQnty} />
+      <Navbar setIsOpen={setIsOpen} isOpen={isOpen} />
       <main className="relative flex min-h-screen flex-col items-center bg-neutral-900 pb-16 pt-5 overscroll-none">
         <div className="max-w-xs px-5">
           <Image alt="Marshall logo" src={marshallogo} className="" />
@@ -113,7 +97,6 @@ const Home = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
       <footer className="w-full bg-black py-3 text-center text-xs text-neutral-700">
         Copyright &copy; {new Date().getFullYear()} Pimenta Marshall
       </footer>
-      <ShoppingCart cart={cart} setIsOpen={setIsOpen} isOpen={isOpen} />
       
     </>
   );

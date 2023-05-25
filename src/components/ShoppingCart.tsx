@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "redux/hooks";
 import {
   CartState,
@@ -16,18 +16,24 @@ import { setShipping } from "redux/shipping.slice";
 const ShoppingCart: React.FC<{
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   isOpen: boolean;
-  cart: CartState;
 }> = (props) => {
   const [cepInput, setCepInput] = useState<string>("");
   const [error, setError] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [cepInfo, setCepInfo] = useState<SingleCepResponse>();
+  const [cart, setCart] = useState<CartState>([]);
 
-  const { setIsOpen, isOpen, cart } = props;
+  const { setIsOpen, isOpen } = props;
 
   const dispatch = useAppDispatch();
 
   const shipping = useAppSelector((state) => state.shipping)
+  const currentCart = useAppSelector((state) => state.cart);
+
+  useEffect(() => {
+    setCart(currentCart);
+  }, [currentCart]);
+
 
   const deliveryChangeHandle = (e: React.ChangeEvent<HTMLInputElement>) => {
     switch (e.target.value) {
