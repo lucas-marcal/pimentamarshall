@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { CartState } from "redux/cart.slice";
 import { useAppSelector } from "redux/hooks";
 import Loading from "~/components/Loading";
+import { api } from "~/utils/api";
 
 const Checkout = () => {
   const [cart, setCart] = useState<CartState>([]);
@@ -17,6 +18,9 @@ const Checkout = () => {
   const currentCart = useAppSelector((state) => state.cart);
   const address = useAppSelector((state) => state.address);
   const shipping = useAppSelector((state) => state.shipping);
+
+  const createOrder = api.order.createOrder.useMutation();
+  const createOrderItem = api.order.createOrderItem.useMutation();
 
   const form = useFormik({
     initialValues: {
@@ -30,19 +34,27 @@ const Checkout = () => {
       cep: address.cep,
     },
     onSubmit: async (values) => {
-      setOrderStatus("ordering");
+      // setOrderStatus("ordering");
       const order = {
         ...values,
         items: cart,
-        orderTotal: getTotalPriceWithShipping().toFixed(2),
+        orderTotal: Number(getTotalPriceWithShipping().toFixed(2)),
       };
-      const result = await axios.post(
-        "https://api-pagamentos.pimentamarshall.com.br/create-order",
-        order
-      );
-      setQrCode(result.data.qrcode);
-      setQrCodeImg(result.data.imagemQrcode);
-      setOrderStatus("order-received");
+
+      const newOrder = await createOrder.mutateAsync(order);
+      console.log(newOrder)
+      cart.forEach((cartItem) => {
+        createOrderItem.mutate({...cartItem, orderId: newOrder.id})
+      })
+
+      // const result = await axios.post(
+      //   "https://api-pagamentos.pimentamarshall.com.br/create-order",
+      //   order
+      // );
+      
+      // setQrCode(result.data.qrcode);
+      // setQrCodeImg(result.data.imagemQrcode);
+      // setOrderStatus("order-received");
     },
   });
 
@@ -277,6 +289,7 @@ const Checkout = () => {
                       type="text"
                       onChange={form.handleChange}
                       value={form.values.complemento}
+                      placeholder="AP, Lote, etc..."
                     />
                   </div>
                 </div>

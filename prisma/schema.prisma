@@ -50,9 +50,9 @@ model Address {
     bairro     String?
     city       String
     region     String
-    postalCode Int
-    user       User        @relation(fields: [userId], references: [id])
-    userId     String      @unique
+    zipCode    String
+    user       User?       @relation(fields: [userId], references: [id])
+    userId     String?     @unique
     shopOrder  ShopOrder[]
 }
 
