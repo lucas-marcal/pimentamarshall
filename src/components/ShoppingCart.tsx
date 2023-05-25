@@ -36,7 +36,7 @@ const ShoppingCart: React.FC<{
         break;
 
       case "Sedex":
-        dispatch(setShipping({type: "SEDEX", price: 22.5}))
+        dispatch(setShipping({type: "SEDEX", price: 0.01}))
         break;
 
       default:
