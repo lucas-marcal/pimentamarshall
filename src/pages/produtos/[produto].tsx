@@ -54,7 +54,7 @@ const Produto = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Navbar setIsOpen={setIsOpen} isOpen={isOpen} itemsQnty={itemsQnty} />
+      <Navbar setIsOpen={setIsOpen} isOpen={isOpen} />
       <main className="relative flex flex-col items-center bg-neutral-900 pb-24 pt-5 px-3">
         <div className="flex flex-col max-w-2xl gap-8">
           <div className="flex flex-wrap">
@@ -90,7 +90,7 @@ const Produto = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
       <footer className="w-full bg-black py-3 text-center text-xs text-neutral-700">
         Copyright &copy; {new Date().getFullYear()} Pimenta Marshall
       </footer>
-      <ShoppingCart cart={cart} setIsOpen={setIsOpen} isOpen={isOpen} />
+      <ShoppingCart setIsOpen={setIsOpen} isOpen={isOpen} />
     </>
   );
 };
