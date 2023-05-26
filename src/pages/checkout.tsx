@@ -445,7 +445,7 @@ const Checkout = () => {
                 className="mb-3 block w-full appearance-none rounded border border-neutral-500 bg-neutral-950 px-4 py-3 leading-tight text-neutral-50 placeholder:text-neutral-700 focus:border-neutral-100 focus:bg-neutral-900 focus:outline-none"
               />
               <button
-                onClick={handleCopyToClipboard}
+                onClick={() => void handleCopyToClipboard()}
                 className="w-full rounded-lg bg-white/10 px-7 py-3 font-semibold text-white no-underline transition hover:bg-lime-400 hover:text-neutral-950 md:w-fit"
               >
                 {copyToClipboard === false
