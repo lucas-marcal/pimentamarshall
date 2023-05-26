@@ -7,6 +7,7 @@ import { CartState } from "redux/cart.slice";
 import { useAppSelector } from "redux/hooks";
 import Loading from "~/components/Loading";
 import { api } from "~/utils/api";
+import * as Yup from "yup";
 
 const Checkout = () => {
   const [cart, setCart] = useState<CartState>([]);
@@ -42,20 +43,29 @@ const Checkout = () => {
       };
 
       const newOrder = await createOrder.mutateAsync(order);
-      console.log(newOrder)
+      console.log(newOrder);
       cart.forEach((cartItem) => {
-        createOrderItem.mutate({...cartItem, orderId: newOrder.id})
-      })
+        createOrderItem.mutate({ ...cartItem, orderId: newOrder.id });
+      });
 
       // const result = await axios.post(
       //   "https://api-pagamentos.pimentamarshall.com.br/create-order",
       //   order
       // );
-      
+
       // setQrCode(result.data.qrcode);
       // setQrCodeImg(result.data.imagemQrcode);
       // setOrderStatus("order-received");
     },
+    validationSchema: Yup.object({
+      nome: Yup.string().required("Campo obrigatório!"),
+      sobrenome: Yup.string().required("Campo obrigatório!"),
+      endereco: Yup.string().required("Campo obrigatório!"),
+      numero: Yup.string().required("Campo obrigatório!"),
+      cidade: Yup.string().required("Campo obrigatório!"),
+      estado: Yup.string().required("Campo obrigatório!"),
+      cep: Yup.string().required("Campo obrigatório!"),
+    }),
   });
 
   useEffect(() => {
@@ -202,7 +212,7 @@ const Checkout = () => {
                 onSubmit={form.handleSubmit}
                 className="mb-4 flex w-full flex-col"
               >
-                <div className="-mx-3 mb-5 flex flex-wrap">
+                <div className="-mx-3 mb-3 flex flex-wrap">
                   <div className="mb-3 w-full px-3 md:mb-0 md:w-1/2">
                     <label
                       className="mb-2 block text-xs font-bold uppercase tracking-wide text-red-600"
@@ -217,11 +227,14 @@ const Checkout = () => {
                       type="text"
                       placeholder="Jorge"
                       onChange={form.handleChange}
+                      onBlur={form.handleBlur}
                       value={form.values.nome}
                     />
-                    {/* <p className="text-xs italic text-red-500">
-                  Por favor preencha este campo.
-                </p> */}
+                    {form.errors.nome && form.touched.nome && (
+                      <p className="text-xs italic text-red-500 mt-1">
+                        {form.errors.nome}
+                      </p>
+                    )}
                   </div>
                   <div className="w-full px-3 md:w-1/2">
                     <label
@@ -237,12 +250,18 @@ const Checkout = () => {
                       type="text"
                       placeholder="Ben Jor"
                       onChange={form.handleChange}
+                      onBlur={form.handleBlur}
                       value={form.values.sobrenome}
                     />
+                    {form.errors.sobrenome && form.touched.sobrenome && (
+                      <p className="text-xs italic text-red-500 mt-1">
+                        {form.errors.sobrenome}
+                      </p>
+                    )}
                   </div>
                 </div>
-                <div className="-mx-3 mb-2 flex flex-wrap">
-                  <div className="w-full px-3 md:w-1/2">
+                <div className="-mx-3 mb-3 md:mb-0 flex flex-wrap">
+                  <div className="mb-3 w-full px-3 md:w-1/2">
                     <label
                       className="mb-2 block text-xs font-bold uppercase tracking-wide text-red-600"
                       htmlFor="endereco"
@@ -250,14 +269,20 @@ const Checkout = () => {
                       Endereço
                     </label>
                     <input
-                      className="mb-3 block w-full appearance-none rounded border border-neutral-500 bg-neutral-950 px-4 py-3 leading-tight text-neutral-50 placeholder:text-neutral-700 focus:border-neutral-100 focus:bg-neutral-900 focus:outline-none"
+                      className="block w-full appearance-none rounded border border-neutral-500 bg-neutral-950 px-4 py-3 leading-tight text-neutral-50 placeholder:text-neutral-700 focus:border-neutral-100 focus:bg-neutral-900 focus:outline-none"
                       id="endereco"
                       name="endereco"
                       type="text"
                       placeholder="Rua, Av..."
                       onChange={form.handleChange}
+                      onBlur={form.handleBlur}
                       value={form.values.endereco}
                     />
+                    {form.errors.endereco && form.touched.endereco && (
+                      <p className="text-xs italic text-red-500 mt-1">
+                        {form.errors.endereco}
+                      </p>
+                    )}
                   </div>
                   <div className="w-1/2 px-3 md:w-1/4">
                     <label
@@ -267,13 +292,19 @@ const Checkout = () => {
                       Número
                     </label>
                     <input
-                      className="mb-3 block w-full appearance-none rounded border border-neutral-500 bg-neutral-950 px-4 py-3 leading-tight text-neutral-50 placeholder:text-neutral-700 focus:border-neutral-100 focus:bg-neutral-900 focus:outline-none"
+                      className="block w-full appearance-none rounded border border-neutral-500 bg-neutral-950 px-4 py-3 leading-tight text-neutral-50 placeholder:text-neutral-700 focus:border-neutral-100 focus:bg-neutral-900 focus:outline-none"
                       id="numero"
                       name="numero"
                       type="text"
                       onChange={form.handleChange}
+                      onBlur={form.handleBlur}
                       value={form.values.numero}
                     />
+                    {form.errors.numero && form.touched.numero && (
+                      <p className="text-xs italic text-red-500 mt-1">
+                        {form.errors.numero}
+                      </p>
+                    )}
                   </div>
                   <div className="w-1/2 px-3 md:w-1/4">
                     <label
@@ -283,18 +314,19 @@ const Checkout = () => {
                       Complemento
                     </label>
                     <input
-                      className="mb-3 block w-full appearance-none rounded border border-neutral-500 bg-neutral-950 px-4 py-3 leading-tight text-neutral-50 placeholder:text-neutral-700 focus:border-neutral-100 focus:bg-neutral-900 focus:outline-none"
+                      className="block w-full appearance-none rounded border border-neutral-500 bg-neutral-950 px-4 py-3 leading-tight text-neutral-50 placeholder:text-neutral-700 focus:border-neutral-100 focus:bg-neutral-900 focus:outline-none"
                       id="complemento"
                       name="complemento"
                       type="text"
                       onChange={form.handleChange}
+                      onBlur={form.handleBlur}
                       value={form.values.complemento}
                       placeholder="AP, Lote, etc..."
                     />
                   </div>
                 </div>
                 <div className="-mx-3 mb-2 flex flex-wrap">
-                  <div className="mb-6 w-8/12 px-3 md:mb-0 md:w-5/12">
+                  <div className="mb-3 w-8/12 px-3 md:mb-0 md:w-5/12">
                     <label
                       className="mb-2 block text-xs font-bold uppercase tracking-wide text-red-600"
                       htmlFor="cidade"
@@ -308,10 +340,16 @@ const Checkout = () => {
                       type="text"
                       placeholder="Belo Horizonte"
                       onChange={form.handleChange}
+                      onBlur={form.handleBlur}
                       value={form.values.cidade}
                     />
+                    {form.errors.cidade && form.touched.cidade && (
+                      <p className="text-xs italic text-red-500 mt-1">
+                        {form.errors.cidade}
+                      </p>
+                    )}
                   </div>
-                  <div className="mb-6 w-4/12 px-3 md:mb-0 md:w-2/12">
+                  <div className="mb-3 w-4/12 px-3 md:mb-0 md:w-2/12">
                     <label
                       className="mb-2 block text-xs font-bold uppercase tracking-wide text-red-600"
                       htmlFor="estado"
@@ -327,8 +365,14 @@ const Checkout = () => {
                         maxLength={2}
                         placeholder="UF"
                         onChange={form.handleChange}
+                        onBlur={form.handleBlur}
                         value={form.values.estado}
                       />
+                      {form.errors.estado && form.touched.estado && (
+                      <p className="text-xs italic text-red-500 mt-1">
+                        {form.errors.estado}
+                      </p>
+                    )}
                     </div>
                   </div>
                   <div className="w-full px-3 md:mb-0 md:w-5/12">
@@ -345,13 +389,24 @@ const Checkout = () => {
                       type="text"
                       placeholder="insira seu CEP"
                       onChange={form.handleChange}
+                      onBlur={form.handleBlur}
                       value={form.values.cep}
                     />
+                    {form.errors.cep && form.touched.cep && (
+                      <p className="text-xs italic text-red-500 mt-1">
+                        {form.errors.cep}
+                      </p>
+                    )}
                   </div>
                 </div>
+                {!form.isValid && (
+                  <div className="flex align-middle justify-center mt-2">
+                  <p className="p-2 bg-red-600 rounded leading-tight text-sm w-full text-center"><span className="font-bold">Erro: </span>Preencha o todos os campos corretamente.</p>
+                  </div>
+                )}
                 <button
                   type="submit"
-                  className="mt-5 w-full self-end rounded-lg bg-white/10 px-7 py-3 font-semibold text-white no-underline transition hover:bg-lime-400 hover:text-neutral-950 md:w-fit"
+                  className="mt-3 w-full self-end rounded-lg bg-white/10 px-7 py-3 font-semibold text-white no-underline transition hover:bg-lime-400 hover:text-neutral-950 md:w-fit"
                 >
                   Confirmar compra
                 </button>
@@ -364,13 +419,13 @@ const Checkout = () => {
               <p className="mb-1 block font-bold text-neutral-50">
                 Pix válido por 1 hora:
               </p>
-              <p className="mb-5 block text-xs text-neutral-500 text-center">
+              <p className="mb-5 block text-center text-xs text-neutral-500">
                 caso o pagamento não seja efetuado, o pedido será cancelado.
               </p>
               <p className="mb-2 block text-xs font-bold uppercase tracking-wide text-red-600">
                 PIX QRCode:
               </p>
-              <img src={qrCodeImg} className="mb-5"/>
+              <img src={qrCodeImg} className="mb-5" />
               <p className="mb-2 block text-xs font-bold uppercase tracking-wide text-red-600">
                 Chave PIX Copia & Cola:
               </p>
@@ -380,7 +435,7 @@ const Checkout = () => {
                 id="qrcode"
                 value={qrCode}
                 readOnly
-                className="block w-full appearance-none rounded border border-neutral-500 bg-neutral-950 px-4 py-3 mb-3 leading-tight text-neutral-50 placeholder:text-neutral-700 focus:border-neutral-100 focus:bg-neutral-900 focus:outline-none"
+                className="mb-3 block w-full appearance-none rounded border border-neutral-500 bg-neutral-950 px-4 py-3 leading-tight text-neutral-50 placeholder:text-neutral-700 focus:border-neutral-100 focus:bg-neutral-900 focus:outline-none"
               />
               <button
                 onClick={handleCopyToClipboard}

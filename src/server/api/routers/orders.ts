@@ -42,11 +42,27 @@ const cartSchema = z.array(cartProductSchema);
 
 export const ordersRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
-    const products = await ctx.prisma.product.findMany({
-      orderBy: [{ orderOnPage: "asc" }],
+    const orders = await ctx.prisma.shopOrder.findMany({
+      orderBy: [{ createdAt: "desc" }],
     });
 
-    return products;
+    return orders;
+  }),
+
+  getOrderItems: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
+    const orderItems = await ctx.prisma.orderItem.findMany({
+      where: { shopOrderId: input },
+    });
+
+    return orderItems;
+  }),
+
+  getClientInfo: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
+    const clientInfo = await ctx.prisma.address.findUnique({
+      where: { id: input },
+    });
+
+    return clientInfo;
   }),
 
   createOrderItem: publicProcedure
