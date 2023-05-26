@@ -88,9 +88,13 @@ const Checkout = () => {
     return itemsTotal + shipping.price;
   };
 
-  const handleCopyToClipboard = () => {
-    navigator.clipboard.writeText(qrCode);
-    setCopyToClipboard(true);
+  const handleCopyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(qrCode);
+      setCopyToClipboard(true);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -231,7 +235,7 @@ const Checkout = () => {
                       value={form.values.nome}
                     />
                     {form.errors.nome && form.touched.nome && (
-                      <p className="text-xs italic text-red-500 mt-1">
+                      <p className="mt-1 text-xs italic text-red-500">
                         {form.errors.nome}
                       </p>
                     )}
@@ -254,13 +258,13 @@ const Checkout = () => {
                       value={form.values.sobrenome}
                     />
                     {form.errors.sobrenome && form.touched.sobrenome && (
-                      <p className="text-xs italic text-red-500 mt-1">
+                      <p className="mt-1 text-xs italic text-red-500">
                         {form.errors.sobrenome}
                       </p>
                     )}
                   </div>
                 </div>
-                <div className="-mx-3 mb-3 md:mb-0 flex flex-wrap">
+                <div className="-mx-3 mb-3 flex flex-wrap md:mb-0">
                   <div className="mb-3 w-full px-3 md:w-1/2">
                     <label
                       className="mb-2 block text-xs font-bold uppercase tracking-wide text-red-600"
@@ -279,7 +283,7 @@ const Checkout = () => {
                       value={form.values.endereco}
                     />
                     {form.errors.endereco && form.touched.endereco && (
-                      <p className="text-xs italic text-red-500 mt-1">
+                      <p className="mt-1 text-xs italic text-red-500">
                         {form.errors.endereco}
                       </p>
                     )}
@@ -301,7 +305,7 @@ const Checkout = () => {
                       value={form.values.numero}
                     />
                     {form.errors.numero && form.touched.numero && (
-                      <p className="text-xs italic text-red-500 mt-1">
+                      <p className="mt-1 text-xs italic text-red-500">
                         {form.errors.numero}
                       </p>
                     )}
@@ -344,7 +348,7 @@ const Checkout = () => {
                       value={form.values.cidade}
                     />
                     {form.errors.cidade && form.touched.cidade && (
-                      <p className="text-xs italic text-red-500 mt-1">
+                      <p className="mt-1 text-xs italic text-red-500">
                         {form.errors.cidade}
                       </p>
                     )}
@@ -369,10 +373,10 @@ const Checkout = () => {
                         value={form.values.estado}
                       />
                       {form.errors.estado && form.touched.estado && (
-                      <p className="text-xs italic text-red-500 mt-1">
-                        {form.errors.estado}
-                      </p>
-                    )}
+                        <p className="mt-1 text-xs italic text-red-500">
+                          {form.errors.estado}
+                        </p>
+                      )}
                     </div>
                   </div>
                   <div className="w-full px-3 md:mb-0 md:w-5/12">
@@ -393,15 +397,18 @@ const Checkout = () => {
                       value={form.values.cep}
                     />
                     {form.errors.cep && form.touched.cep && (
-                      <p className="text-xs italic text-red-500 mt-1">
+                      <p className="mt-1 text-xs italic text-red-500">
                         {form.errors.cep}
                       </p>
                     )}
                   </div>
                 </div>
                 {!form.isValid && (
-                  <div className="flex align-middle justify-center mt-2">
-                  <p className="p-2 bg-red-600 rounded leading-tight text-sm w-full text-center"><span className="font-bold">Erro: </span>Preencha o todos os campos corretamente.</p>
+                  <div className="mt-2 flex justify-center align-middle">
+                    <p className="w-full rounded bg-red-600 p-2 text-center text-sm leading-tight">
+                      <span className="font-bold">Erro: </span>Preencha o todos
+                      os campos corretamente.
+                    </p>
                   </div>
                 )}
                 <button
