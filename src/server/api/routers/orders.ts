@@ -49,21 +49,25 @@ export const ordersRouter = createTRPCRouter({
     return orders;
   }),
 
-  getOrderItems: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
-    const orderItems = await ctx.prisma.orderItem.findMany({
-      where: { shopOrderId: input },
-    });
+  getOrderItems: publicProcedure
+    .input(z.string())
+    .query(async ({ ctx, input }) => {
+      const orderItems = await ctx.prisma.orderItem.findMany({
+        where: { shopOrderId: input },
+      });
 
-    return orderItems;
-  }),
+      return orderItems;
+    }),
 
-  getClientInfo: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
-    const clientInfo = await ctx.prisma.address.findUnique({
-      where: { id: input },
-    });
+  getClientInfo: publicProcedure
+    .input(z.string())
+    .query(async ({ ctx, input }) => {
+      const clientInfo = await ctx.prisma.address.findUnique({
+        where: { id: input },
+      });
 
-    return clientInfo;
-  }),
+      return clientInfo;
+    }),
 
   createOrderItem: publicProcedure
     .input(
@@ -78,20 +82,20 @@ export const ordersRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-        const newOrderItem = await ctx.prisma.orderItem.create({
-            data: {
-                quantity: input.quantity,
-                value: input.price,
-                shoppingOrder: {
-                  connect: { id: input.orderId}
-                },
-                item: {
-                  connect: {id: input.id}
-                }
-            }
-        })
+      const newOrderItem = await ctx.prisma.orderItem.create({
+        data: {
+          quantity: input.quantity,
+          value: input.price,
+          shoppingOrder: {
+            connect: { id: input.orderId },
+          },
+          item: {
+            connect: { id: input.id },
+          },
+        },
+      });
 
-        return newOrderItem
+      return newOrderItem;
     }),
 
   createOrder: publicProcedure
@@ -112,6 +116,8 @@ export const ordersRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const newOrder = await ctx.prisma.shopOrder.create({
         data: {
+          clientName: input.nome,
+          clientLastName: input.sobrenome,
           status: "PENDING",
           totalValue: Number(input.orderTotal),
           paymentMethod: "PIX",
@@ -132,6 +138,17 @@ export const ordersRouter = createTRPCRouter({
       });
 
       return newOrder;
+    }),
+
+  addTxid: publicProcedure
+    .input(z.object({ id: z.string(), txid: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const updatedOrder = ctx.prisma.shopOrder.update({
+        where: { id: input.id },
+        data: { txid: input.txid },
+      });
+
+      return updatedOrder;
     }),
 
   getBySlug: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {

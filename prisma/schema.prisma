@@ -68,6 +68,9 @@ model ShopOrder {
     shippingMethod   ShippingMethod @relation(fields: [shippingMethodId], references: [id])
     shippingMethodId String
     items            OrderItem[]
+    txid             String?
+    clientName       String         @default("Ze")
+    clientLastName   String         @default("Das Couve")
 }
 
 model ShoppingSession {

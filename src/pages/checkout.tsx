@@ -22,6 +22,7 @@ const Checkout = () => {
 
   const createOrder = api.order.createOrder.useMutation();
   const createOrderItem = api.order.createOrderItem.useMutation();
+  const addTxid = api.order.addTxid.useMutation();
 
   const form = useFormik({
     initialValues: {
@@ -35,7 +36,7 @@ const Checkout = () => {
       cep: address.cep,
     },
     onSubmit: async (values) => {
-      // setOrderStatus("ordering");
+      setOrderStatus("ordering");
       const order = {
         ...values,
         items: cart,
@@ -48,14 +49,21 @@ const Checkout = () => {
         createOrderItem.mutate({ ...cartItem, orderId: newOrder.id });
       });
 
-      // const result = await axios.post(
-      //   "https://api-pagamentos.pimentamarshall.com.br/create-order",
-      //   order
-      // );
+      const result = await axios.post(
+        "https://api-pagamentos.pimentamarshall.com.br/create-order",
+        order
+      );
 
-      // setQrCode(result.data.qrcode);
-      // setQrCodeImg(result.data.imagemQrcode);
-      // setOrderStatus("order-received");
+      const toUpdateTxid = {
+        id: newOrder.id,
+        txid: result.data.txid
+      }
+
+      addTxid.mutate(toUpdateTxid);
+
+      setQrCode(result.data.qrcode);
+      setQrCodeImg(result.data.imagemQrcode);
+      setOrderStatus("order-received");
     },
     validationSchema: Yup.object({
       nome: Yup.string().required("Campo obrigatório!"),
