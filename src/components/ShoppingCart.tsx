@@ -106,7 +106,7 @@ const ShoppingCart: React.FC<{
       }
 
       const res = await axios.get<SingleCepResponse>(
-        `https://viacep.com.br/ws/${inputToNumber}/json/`
+        `https://viacep.com.br/ws/${inputWithoutSpaces}/json/`
       );
 
       if (res.data.erro) {
