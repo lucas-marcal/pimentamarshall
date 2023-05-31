@@ -110,6 +110,11 @@ export const ordersRouter = createTRPCRouter({
         estado: z.string(),
         cep: z.string(),
         items: cartSchema,
+        shipping: z.object({
+          type: z.string(),
+          price: z.number(),
+          id: z.string(),
+        }),
         orderTotal: z.number(),
       })
     )
@@ -132,7 +137,7 @@ export const ordersRouter = createTRPCRouter({
             },
           },
           shippingMethod: {
-            connect: { id: "cli39fxlq0000v4lk7neufuuo" },
+            connect: { id: input.shipping.id },
           },
         },
       });

@@ -105,7 +105,7 @@ model OrderItem {
 model ShippingMethod {
     id        String      @id @default(cuid())
     name      String
-    price     Float?
+    price     Float
     ShopOrder ShopOrder[]
 }
 

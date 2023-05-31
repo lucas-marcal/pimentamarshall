@@ -3,11 +3,13 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 interface shippingState {
     type: string
     price: number
+    id: string
   }
 
 const initialState: shippingState = {
     type: "",
-    price: 0
+    price: 0,
+    id: "",
 }
 
 const shippingSlice = createSlice({
@@ -17,6 +19,7 @@ const shippingSlice = createSlice({
     setShipping: (state, action: PayloadAction<shippingState>) => {
       state.type = action.payload.type;
       state.price = action.payload.price;
+      state.id = action.payload.id;
     }
   },
 });

@@ -7,11 +7,15 @@ import {
   removeFromCart,
 } from "redux/cart.slice";
 import Image from "next/image";
-import { MagnifyingGlassIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
+import {
+  MagnifyingGlassIcon,
+  ExclamationCircleIcon,
+} from "@heroicons/react/24/outline";
 import axios from "axios";
 import { setAddress } from "redux/address.slice";
 import Router from "next/router";
 import { setShipping } from "redux/shipping.slice";
+import { api } from "~/utils/api";
 
 const ShoppingCart: React.FC<{
   setIsOpen: Dispatch<SetStateAction<boolean>>;
@@ -27,27 +31,20 @@ const ShoppingCart: React.FC<{
 
   const dispatch = useAppDispatch();
 
-  const shipping = useAppSelector((state) => state.shipping)
+  const shipping = useAppSelector((state) => state.shipping);
   const currentCart = useAppSelector((state) => state.cart);
+
+  const shippingMethods = api.shipping.getAll.useQuery().data;
 
   useEffect(() => {
     setCart(currentCart);
   }, [currentCart]);
 
-
-  const deliveryChangeHandle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    switch (e.target.value) {
-      case "Motoboy":
-        dispatch(setShipping({type: "Motoboy", price: 10}))
-        break;
-
-      case "Sedex":
-        dispatch(setShipping({type: "SEDEX", price: 0.01}))
-        break;
-
-      default:
-        break;
-    }
+  const deliveryChangeHandle = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    price: number
+  ) => {
+    dispatch(setShipping({ type: e.target.value, price, id: e.target.id }));
   };
 
   const getTotalPrice = () => {
@@ -61,18 +58,18 @@ const ShoppingCart: React.FC<{
     try {
       if (!cepInfo) {
         setError(true);
-        setErrorMsg("É necessário inserir um CEP válido!")
+        setErrorMsg("É necessário inserir um CEP válido!");
         return null;
       }
       if (shipping.type === "") {
         setError(true);
-        setErrorMsg("Escolha uma forma de entrega!")
+        setErrorMsg("Escolha uma forma de entrega!");
         return null;
       }
       dispatch(setAddress(cepInfo));
       await Router.push("/checkout");
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   };
 
@@ -101,7 +98,7 @@ const ShoppingCart: React.FC<{
 
       if (!/^[0-9]{8}$/.test(inputWithoutSpaces) || isNaN(inputToNumber)) {
         setError(true);
-        setErrorMsg("CEP inválido!")
+        setErrorMsg("CEP inválido!");
         return null;
       }
 
@@ -111,7 +108,7 @@ const ShoppingCart: React.FC<{
 
       if (res.data.erro) {
         setError(true);
-        setErrorMsg("CEP não encontrado!")
+        setErrorMsg("CEP não encontrado!");
       }
 
       setCepInfo(res.data);
@@ -121,7 +118,7 @@ const ShoppingCart: React.FC<{
   };
 
   const cepInputHandler = async () => {
-    dispatch(setShipping({type: "", price: 0}));
+    dispatch(setShipping({ type: "", price: 0, id: "" }));
     setError(false);
     setCepInfo(undefined);
     await fetchCepInfo().catch((err) => console.log(err));
@@ -209,7 +206,11 @@ const ShoppingCart: React.FC<{
                     id="cep"
                     className="mr-2 w-24 rounded-md border border-red-600 bg-neutral-950 px-2 py-1 text-sm text-neutral-50 outline-none [appearance:textfield] focus:outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                     onChange={(e) => handleChange(e.target.value)}
-                    onKeyDown={(e) => e.code === "Enter" || e.code === "NumpadEnter" ? void cepInputHandler() : null}
+                    onKeyDown={(e) =>
+                      e.code === "Enter" || e.code === "NumpadEnter"
+                        ? void cepInputHandler()
+                        : null
+                    }
                   />
                   <button
                     className="rounded-md bg-lime-400 px-2 text-sm text-neutral-950"
@@ -245,39 +246,34 @@ const ShoppingCart: React.FC<{
               ) : null}
               {cepInfo?.localidade === "Belo Horizonte" ? (
                 <div className="mb-3 flex flex-col rounded-md bg-red-600 p-3">
-                  <div className="flex justify-between py-1">
-                    <div className="flex gap-3 align-middle">
-                      <input
-                        type="radio"
-                        name="deliveryType"
-                        id="motoboy"
-                        value="Motoboy"
-                        className=""
-                        onChange={deliveryChangeHandle}
-                      />
-                      <label htmlFor="motoboy">Motoboy</label>
+                  {shippingMethods?.map((shippingMethod) => (
+                    <div className="flex justify-between py-1" key={shippingMethod.id}>
+                      <div className="flex gap-3 align-middle">
+                        <input
+                          type="radio"
+                          name="deliveryType"
+                          id={shippingMethod.id}
+                          value={shippingMethod.name}
+                          className=""
+                          onChange={(e) =>
+                            deliveryChangeHandle(e, shippingMethod.price)
+                          }
+                        />
+                        <label htmlFor={shippingMethod.name}>
+                          {shippingMethod.name}
+                        </label>
+                      </div>
+                      <p>
+                        R$ {shippingMethod.price?.toFixed(2).replace(".", ",")}
+                      </p>
                     </div>
-                    <p>R$ 10</p>
-                  </div>
-                  <div className="flex justify-between py-1">
-                    <div className="flex gap-3 align-middle">
-                      <input
-                        type="radio"
-                        name="deliveryType"
-                        id="sedex"
-                        value="Sedex"
-                        onChange={deliveryChangeHandle}
-                      />
-                      <label htmlFor="sedex">SEDEX</label>
-                    </div>
-                    <p>R$ 22,50</p>
-                  </div>
+                  ))}
                 </div>
               ) : null}
               {error && (
-                <div className="mb-2 flex rounded-md p-2 justify-center align-middle gap-1">
-                  <ExclamationCircleIcon className="w-6 h-6 shrink-0 text-red-600"/>
-                  <p className="text-center text-red-600 leading-tight">
+                <div className="mb-2 flex justify-center gap-1 rounded-md p-2 align-middle">
+                  <ExclamationCircleIcon className="h-6 w-6 shrink-0 text-red-600" />
+                  <p className="text-center leading-tight text-red-600">
                     {errorMsg}
                   </p>
                 </div>
@@ -286,9 +282,14 @@ const ShoppingCart: React.FC<{
                 onClick={() => void goToCheckout()}
                 className="mb-3 rounded-lg bg-white/10 px-7 py-3 font-semibold text-white no-underline transition hover:bg-lime-400 hover:text-neutral-950"
               >
-                Finalizar a compra <span className="font-normal">&#40;R$ {(getTotalPrice() + shipping.price)
+                Finalizar a compra{" "}
+                <span className="font-normal">
+                  &#40;R${" "}
+                  {(getTotalPrice() + shipping.price)
                     .toFixed(2)
-                    .replace(".", ",")}&#41;</span>
+                    .replace(".", ",")}
+                  &#41;
+                </span>
               </button>
             </div>
           </>
