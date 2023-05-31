@@ -11,11 +11,18 @@ import * as Yup from "yup";
 import Link from "next/link";
 import marshallIcon from "../../public/img/marshall-icn-preto.png";
 
+interface itemFormattedForAPI {
+  name: string;
+  value: number;
+  amount: number;
+}
+
 const Checkout = () => {
   const [cart, setCart] = useState<CartState>([]);
   const [orderStatus, setOrderStatus] = useState("pre-order");
   const [qrCode, setQrCode] = useState("");
   const [qrCodeImg, setQrCodeImg] = useState("");
+  const [paymentURL, setPaymentURL] = useState("");
   const [copyToClipboard, setCopyToClipboard] = useState(false);
   const [paymentType, setPaymentType] = useState("pix");
 
@@ -39,13 +46,14 @@ const Checkout = () => {
       cep: address.cep,
     },
     onSubmit: async (values) => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
       setOrderStatus("ordering");
       const order = {
         ...values,
         items: cart,
         shipping: {
           type: shipping.type,
-          price: Number(shipping.price)*100,
+          price: Number(shipping.price) * 100,
           id: shipping.id,
         },
         orderTotal: Number(getTotalPriceWithShipping().toFixed(2)),
@@ -60,34 +68,60 @@ const Checkout = () => {
       });
 
       if (paymentType === "pix") {
-        const result = await axios.post(
-          "https://api-pagamentos.pimentamarshall.com.br/create-order",
-          order
-        );
-  
-        const toUpdateTxid = {
-          id: newOrder.id,
-          txid: result.data.txid
+        try {
+          const result = await axios.post(
+            "https://api-pagamentos.pimentamarshall.com.br/create-order",
+            order
+          );
+
+          const toUpdateTxid = {
+            id: newOrder.id,
+            txid: result.data.txid,
+          };
+
+          addTxid.mutate(toUpdateTxid);
+
+          setQrCode(result.data.qrcode);
+          setQrCodeImg(result.data.imagemQrcode);
+          setOrderStatus("order-received-pix");
+        } catch (error) {
+          console.log(error);
+          setOrderStatus("error");
         }
-  
-        addTxid.mutate(toUpdateTxid);
-  
-        setQrCode(result.data.qrcode);
-        setQrCodeImg(result.data.imagemQrcode);
-        setOrderStatus("order-received-pix");
       }
 
       if (paymentType === "cardOrBillet") {
+        let itemsFormattedForAPI: itemFormattedForAPI[] = [];
+        order.items.forEach((item) => {
+          itemsFormattedForAPI.push({
+            name: item.name,
+            value: Number(item.price) * 100,
+            amount: item.quantity,
+          });
+        });
+
         const cardOrBilletOrder = {
           ...order,
-          id: newOrder.id
+          id: newOrder.id,
+          items: itemsFormattedForAPI,
+        };
+
+        try {
+          const result = await axios.post(
+            "https://api-pagamentos.pimentamarshall.com.br/create-one-step-link",
+            cardOrBilletOrder
+          );
+
+          setPaymentURL(result.data.payment_url);
+          console.log(paymentURL);
+          console.log(result);
+
+          setOrderStatus("order-received-cardOrBillet");
+        } catch (error) {
+          console.log(error);
+          setOrderStatus("error");
         }
-        const result = await axios.post(
-          "https://api-pagamentos.pimentamarshall.com.br/create-one-step-link",
-          cardOrBilletOrder
-        );
       }
-      
     },
     validationSchema: Yup.object({
       nome: Yup.string().required("Campo obrigatório!"),
@@ -226,11 +260,27 @@ const Checkout = () => {
               </div>
               <div className="w-full">
                 <div className="mb-4 flex w-full rounded-md border-2 border-red-600 bg-neutral-950 p-2 text-neutral-50">
-                  <div className="w-14 h-14 m-3 p-2 bg-red-600 rounded-full">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 143.38 143.8"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><path d="M40.21,72.56a9.47,9.47,0,1,1,6.68-2.78,9.49,9.49,0,0,1-6.68,2.78Zm0-13.51a4.06,4.06,0,1,0,4,4.05,4.07,4.07,0,0,0-4-4.05Z"/><path d="M140.57,72.17c-4.24-29.64-15-49.7-32.95-61.31C91.37.34,68.65-2.82,48.29,2.62,5.77,14-9.57,55.57,5.86,96.69a16.18,16.18,0,0,0,9.49,9.45l95.59,36.1a23.9,23.9,0,0,0,32.38-21.88,316.93,316.93,0,0,0-2.75-48.19Zm-2.72,34.29L69.36,78.83A13.78,13.78,0,0,1,60.57,67a13.2,13.2,0,0,1,13.77-13.7H131a131.76,131.76,0,0,1,4.24,19.63,295.86,295.86,0,0,1,2.63,33.52Zm.07,13.8h0a18.5,18.5,0,0,1-25.07,16.93l-95.59-36.1a10.84,10.84,0,0,1-6.35-6.3C-3.36,56.74,10.25,18.38,49.69,7.84c18.91-5.07,40-2.16,55,7.56,11,7.13,19.1,17.87,24.47,32.51H74.33A18.59,18.59,0,0,0,55.17,67.3,19.23,19.23,0,0,0,67.33,83.84l70.61,28.47c0,2.67,0,5.33,0,8Z"/><path d="M11.16,72.12C8.58,45,21.51,23.16,46.68,14.45a2.7,2.7,0,0,1,1.77,5.11c-23.26,8.05-34.2,28-31.92,52.05a2.7,2.7,0,0,1-5.37.51Z"/><path d="M56,12A68.11,68.11,0,0,1,66,10.83a2.7,2.7,0,0,1,.22,5.4A62.8,62.8,0,0,0,57,17.29,2.7,2.7,0,0,1,56,12Z"/><path d="M97.79,66.21l5.4-5.4A2.7,2.7,0,0,1,107,64.63L101.6,70a2.7,2.7,0,0,1-3.81-3.82Z"/><path d="M100.32,80.24l18.91-18.91a2.7,2.7,0,0,1,3.82,3.82L104.14,84.06a2.7,2.7,0,0,1-3.82-3.82Z"/></g></g></svg>
+                  <div className="m-3 h-14 w-14 rounded-full bg-red-600 p-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 143.38 143.8"
+                    >
+                      <g id="Layer_2" data-name="Layer 2">
+                        <g id="Layer_1-2" data-name="Layer 1">
+                          <path d="M40.21,72.56a9.47,9.47,0,1,1,6.68-2.78,9.49,9.49,0,0,1-6.68,2.78Zm0-13.51a4.06,4.06,0,1,0,4,4.05,4.07,4.07,0,0,0-4-4.05Z" />
+                          <path d="M140.57,72.17c-4.24-29.64-15-49.7-32.95-61.31C91.37.34,68.65-2.82,48.29,2.62,5.77,14-9.57,55.57,5.86,96.69a16.18,16.18,0,0,0,9.49,9.45l95.59,36.1a23.9,23.9,0,0,0,32.38-21.88,316.93,316.93,0,0,0-2.75-48.19Zm-2.72,34.29L69.36,78.83A13.78,13.78,0,0,1,60.57,67a13.2,13.2,0,0,1,13.77-13.7H131a131.76,131.76,0,0,1,4.24,19.63,295.86,295.86,0,0,1,2.63,33.52Zm.07,13.8h0a18.5,18.5,0,0,1-25.07,16.93l-95.59-36.1a10.84,10.84,0,0,1-6.35-6.3C-3.36,56.74,10.25,18.38,49.69,7.84c18.91-5.07,40-2.16,55,7.56,11,7.13,19.1,17.87,24.47,32.51H74.33A18.59,18.59,0,0,0,55.17,67.3,19.23,19.23,0,0,0,67.33,83.84l70.61,28.47c0,2.67,0,5.33,0,8Z" />
+                          <path d="M11.16,72.12C8.58,45,21.51,23.16,46.68,14.45a2.7,2.7,0,0,1,1.77,5.11c-23.26,8.05-34.2,28-31.92,52.05a2.7,2.7,0,0,1-5.37.51Z" />
+                          <path d="M56,12A68.11,68.11,0,0,1,66,10.83a2.7,2.7,0,0,1,.22,5.4A62.8,62.8,0,0,0,57,17.29,2.7,2.7,0,0,1,56,12Z" />
+                          <path d="M97.79,66.21l5.4-5.4A2.7,2.7,0,0,1,107,64.63L101.6,70a2.7,2.7,0,0,1-3.81-3.82Z" />
+                          <path d="M100.32,80.24l18.91-18.91a2.7,2.7,0,0,1,3.82,3.82L104.14,84.06a2.7,2.7,0,0,1-3.82-3.82Z" />
+                        </g>
+                      </g>
+                    </svg>
                   </div>
                   <div className="flex flex-col">
-                    <p className="">Informe quando você gostaria de receber os seus produtos:</p>
+                    <p className="">
+                      Informe quando você gostaria de receber os seus produtos:
+                    </p>
                   </div>
                 </div>
               </div>
@@ -248,7 +298,7 @@ const Checkout = () => {
                       id="pix"
                       value="pix"
                       className=""
-                      onChange={e => setPaymentType(e.target.value)}
+                      onChange={(e) => setPaymentType(e.target.value)}
                       defaultChecked
                     />
                     <label htmlFor="pix">PIX</label>
@@ -260,7 +310,7 @@ const Checkout = () => {
                       id="cardOrBillet"
                       value="cardOrBillet"
                       className=""
-                      onChange={e => setPaymentType(e.target.value)}
+                      onChange={(e) => setPaymentType(e.target.value)}
                     />
                     <label htmlFor="cardOrBillet">Cartão ou boleto</label>
                   </div>
@@ -511,6 +561,37 @@ const Checkout = () => {
                   ? "Copiar código PIX"
                   : "CÓDIGO PIX COPIADO!"}
               </button>
+            </div>
+          )}
+          {orderStatus === "order-received-cardOrBillet" && (
+            <div className="flex flex-col items-center justify-center">
+              {/* <p className="mb-1 block font-bold text-neutral-50">
+                Pix válido por 1 hora:
+              </p>
+              <p className="mb-5 block text-center text-xs text-neutral-500">
+                caso o pagamento não seja efetuado, o pedido será cancelado.
+              </p> */}
+              <p className="mb-1 block text-xs font-bold uppercase tracking-wide text-red-600">
+                Prossiga para o link de pagamento:
+              </p>
+              <p className="mb-2 block text-center text-xs text-neutral-500">
+                você será redirecionado para o sistema seguro da Efí
+              </p>
+              <a
+                href={paymentURL}
+                className="w-full cursor-pointer rounded-lg bg-white/10 px-7 py-3 font-semibold text-white no-underline transition hover:bg-lime-400 hover:text-neutral-950 md:w-fit"
+                target="_blank"
+              >
+                Link de pagamento
+              </a>
+            </div>
+          )}
+          {orderStatus === "error" && (
+            <div className="flex flex-col items-center justify-center">
+              <p className="mb-1 block text-xs font-bold uppercase tracking-wide text-red-600">
+                Ocorreu um erro! Por favor tente novamente mais tarde.
+              </p>
+              
             </div>
           )}
         </div>
