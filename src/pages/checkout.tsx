@@ -10,6 +10,11 @@ import { api } from "~/utils/api";
 import * as Yup from "yup";
 import Link from "next/link";
 import marshallIcon from "../../public/img/marshall-icn-preto.png";
+import DatePicker, { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { addDays, setHours, setMinutes } from "date-fns";
+import helmetIcon from "../../public/img/helmet-icon.svg";
+import ptBR from "date-fns/locale/pt-BR";
 
 interface itemFormattedForAPI {
   name: string;
@@ -25,6 +30,8 @@ const Checkout = () => {
   const [paymentURL, setPaymentURL] = useState("");
   const [copyToClipboard, setCopyToClipboard] = useState(false);
   const [paymentType, setPaymentType] = useState("pix");
+  const [startDate, setStartDate] = useState(addDays(new Date(), 1));
+  const [temPortaria, setTemPortaria] = useState(false);
 
   const currentCart = useAppSelector((state) => state.cart);
   const address = useAppSelector((state) => state.address);
@@ -33,6 +40,8 @@ const Checkout = () => {
   const createOrder = api.order.createOrder.useMutation();
   const createOrderItem = api.order.createOrderItem.useMutation();
   const addTxid = api.order.addTxid.useMutation();
+
+  registerLocale("pt-BR", ptBR);
 
   const form = useFormik({
     initialValues: {
@@ -137,10 +146,6 @@ const Checkout = () => {
   useEffect(() => {
     setCart(currentCart);
   }, [currentCart]);
-
-  const paymentHandle = () => {
-    console.log("GO TO PAYMENT");
-  };
 
   const getTotalPriceWithShipping = () => {
     const itemsTotal = cart.reduce(
@@ -253,37 +258,105 @@ const Checkout = () => {
                   </p>
                 </div>
               </div>
-              <div className="w-full">
-                <h1 className="inline-block rounded-sm bg-neutral-950 p-2 px-3 text-left text-2xl font-bold uppercase text-lime-400">
-                  Entrega via motoboy:
-                </h1>
-              </div>
-              <div className="w-full">
-                <div className="mb-4 flex w-full rounded-md border-2 border-red-600 bg-neutral-950 p-2 text-neutral-50">
-                  <div className="m-3 h-14 w-14 rounded-full bg-red-600 p-2">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 143.38 143.8"
-                    >
-                      <g id="Layer_2" data-name="Layer 2">
-                        <g id="Layer_1-2" data-name="Layer 1">
-                          <path d="M40.21,72.56a9.47,9.47,0,1,1,6.68-2.78,9.49,9.49,0,0,1-6.68,2.78Zm0-13.51a4.06,4.06,0,1,0,4,4.05,4.07,4.07,0,0,0-4-4.05Z" />
-                          <path d="M140.57,72.17c-4.24-29.64-15-49.7-32.95-61.31C91.37.34,68.65-2.82,48.29,2.62,5.77,14-9.57,55.57,5.86,96.69a16.18,16.18,0,0,0,9.49,9.45l95.59,36.1a23.9,23.9,0,0,0,32.38-21.88,316.93,316.93,0,0,0-2.75-48.19Zm-2.72,34.29L69.36,78.83A13.78,13.78,0,0,1,60.57,67a13.2,13.2,0,0,1,13.77-13.7H131a131.76,131.76,0,0,1,4.24,19.63,295.86,295.86,0,0,1,2.63,33.52Zm.07,13.8h0a18.5,18.5,0,0,1-25.07,16.93l-95.59-36.1a10.84,10.84,0,0,1-6.35-6.3C-3.36,56.74,10.25,18.38,49.69,7.84c18.91-5.07,40-2.16,55,7.56,11,7.13,19.1,17.87,24.47,32.51H74.33A18.59,18.59,0,0,0,55.17,67.3,19.23,19.23,0,0,0,67.33,83.84l70.61,28.47c0,2.67,0,5.33,0,8Z" />
-                          <path d="M11.16,72.12C8.58,45,21.51,23.16,46.68,14.45a2.7,2.7,0,0,1,1.77,5.11c-23.26,8.05-34.2,28-31.92,52.05a2.7,2.7,0,0,1-5.37.51Z" />
-                          <path d="M56,12A68.11,68.11,0,0,1,66,10.83a2.7,2.7,0,0,1,.22,5.4A62.8,62.8,0,0,0,57,17.29,2.7,2.7,0,0,1,56,12Z" />
-                          <path d="M97.79,66.21l5.4-5.4A2.7,2.7,0,0,1,107,64.63L101.6,70a2.7,2.7,0,0,1-3.81-3.82Z" />
-                          <path d="M100.32,80.24l18.91-18.91a2.7,2.7,0,0,1,3.82,3.82L104.14,84.06a2.7,2.7,0,0,1-3.82-3.82Z" />
-                        </g>
-                      </g>
-                    </svg>
+              {shipping.type === "Motoboy" && (
+                <>
+                  <div className="w-full">
+                    <h1 className="inline-block rounded-sm bg-neutral-950 p-2 px-3 text-left text-2xl font-bold uppercase text-lime-400">
+                      Entrega via motoboy:
+                    </h1>
                   </div>
-                  <div className="flex flex-col">
-                    <p className="">
-                      Informe quando você gostaria de receber os seus produtos:
-                    </p>
+                  <div className="w-full">
+                    <div className="mb-4 flex w-full flex-col justify-center gap-3 rounded-md border-2 border-red-600 bg-neutral-950 p-4 align-middle text-neutral-50 sm:flex-row sm:gap-5">
+                      <div className="h-16 w-16 shrink-0 self-center rounded-full bg-red-600 p-3">
+                        <Image
+                          src={helmetIcon}
+                          alt="Motoboy Icon"
+                          width={50}
+                          height={50}
+                        />
+                      </div>
+                      <div className="flex flex-col">
+                        <p className="mb-1 text-lg">
+                          Informe quando você gostaria de receber os seus
+                          produtos:
+                        </p>
+                        <p className="mb-3 text-sm text-red-600">
+                          Certifique de ter alguém para receber os produtos
+                          entre 20min antes e 20min depois do horário informado!
+                        </p>
+                        <div className="mb-2 flex w-fit space-x-3">
+                          <input
+                            type="radio"
+                            name="portaria"
+                            id="naoTemPortaria"
+                            value="naoTemPortaria"
+                            className="checkbox h-4 w-4 shrink-0 cursor-pointer appearance-none self-center rounded-full border-4 border-neutral-950 bg-transparent ring-2 ring-neutral-50 transition-all checked:bg-lime-400 focus:outline-none"
+                            onChange={() => void setTemPortaria(false)}
+                            defaultChecked
+                          />
+                          <label htmlFor="naoTemPortaria">
+                            <DatePicker
+                              selected={startDate}
+                              onChange={(date) => setStartDate(date!)}
+                              excludeDates={[new Date()]}
+                              showTimeSelect
+                              dateFormat="dd/MM/yyyy - HH:mm"
+                              locale="pt-BR"
+                              disabled={temPortaria}
+                              excludeTimes={[
+                                setHours(setMinutes(new Date(), 0), 0),
+                                setHours(setMinutes(new Date(), 30), 0),
+                                setHours(setMinutes(new Date(), 0), 1),
+                                setHours(setMinutes(new Date(), 30), 1),
+                                setHours(setMinutes(new Date(), 0), 2),
+                                setHours(setMinutes(new Date(), 30), 2),
+                                setHours(setMinutes(new Date(), 0), 3),
+                                setHours(setMinutes(new Date(), 30), 3),
+                                setHours(setMinutes(new Date(), 0), 4),
+                                setHours(setMinutes(new Date(), 30), 4),
+                                setHours(setMinutes(new Date(), 0), 5),
+                                setHours(setMinutes(new Date(), 30), 5),
+                                setHours(setMinutes(new Date(), 0), 6),
+                                setHours(setMinutes(new Date(), 30), 6),
+                                setHours(setMinutes(new Date(), 0), 7),
+                                setHours(setMinutes(new Date(), 30), 7),
+                                setHours(setMinutes(new Date(), 0), 8),
+                                setHours(setMinutes(new Date(), 30), 8),
+                                setHours(setMinutes(new Date(), 0), 22),
+                                setHours(setMinutes(new Date(), 30), 22),
+                                setHours(setMinutes(new Date(), 0), 23),
+                                setHours(setMinutes(new Date(), 30), 23),
+                              ]}
+                              className={
+                                temPortaria
+                                  ? "rounded border border-neutral-700 bg-transparent px-3 py-2 text-neutral-700"
+                                  : "cursor-pointer rounded border border-red-600 bg-transparent px-3 py-2 focus:outline-none focus:bg-neutral-800"
+                              }
+                            />
+                          </label>
+                        </div>
+                        <div className="flex w-fit space-x-3">
+                          <input
+                            type="radio"
+                            name="portaria"
+                            id="temPortaria"
+                            value="temPortaria"
+                            className="checkbox h-4 w-4 shrink-0 cursor-pointer appearance-none self-center rounded-full border-4 border-neutral-950 bg-transparent ring-2 ring-neutral-50 transition-all checked:bg-lime-400 focus:outline-none"
+                            onChange={() => void setTemPortaria(true)}
+                          />
+                          <label
+                            htmlFor="temPortaria"
+                            className="cursor-pointer text-sm"
+                          >
+                            Destino com serviço de portaria &#40;a entrega pode
+                            ser feita em qualquer dia e horário&#41;
+                          </label>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
+                </>
+              )}
               <div className="w-full">
                 <h1 className="inline-block rounded-sm bg-neutral-950 p-2 px-3 text-left text-2xl font-bold uppercase text-lime-400">
                   Método de pagamento:
@@ -297,11 +370,13 @@ const Checkout = () => {
                       name="paymentType"
                       id="pix"
                       value="pix"
-                      className=""
+                      className="checkbox h-4 w-4 shrink-0 cursor-pointer appearance-none self-center rounded-full border-4 border-neutral-950 bg-transparent ring-2 ring-neutral-50 transition-all checked:bg-lime-400 focus:outline-none"
                       onChange={(e) => setPaymentType(e.target.value)}
                       defaultChecked
                     />
-                    <label htmlFor="pix">PIX</label>
+                    <label htmlFor="pix" className="cursor-pointer">
+                      PIX
+                    </label>
                   </div>
                   <div className="min-h-24 flex space-x-3 p-3 align-middle">
                     <input
@@ -309,10 +384,12 @@ const Checkout = () => {
                       name="paymentType"
                       id="cardOrBillet"
                       value="cardOrBillet"
-                      className=""
+                      className="checkbox h-4 w-4 shrink-0 cursor-pointer appearance-none self-center rounded-full border-4 border-neutral-950 bg-transparent ring-2 ring-neutral-50 transition-all checked:bg-lime-400 focus:outline-none"
                       onChange={(e) => setPaymentType(e.target.value)}
                     />
-                    <label htmlFor="cardOrBillet">Cartão ou boleto</label>
+                    <label htmlFor="cardOrBillet" className="cursor-pointer">
+                      Cartão ou boleto
+                    </label>
                   </div>
                 </div>
               </div>
@@ -591,7 +668,6 @@ const Checkout = () => {
               <p className="mb-1 block text-xs font-bold uppercase tracking-wide text-red-600">
                 Ocorreu um erro! Por favor tente novamente mais tarde.
               </p>
-              
             </div>
           )}
         </div>

@@ -247,19 +247,25 @@ const ShoppingCart: React.FC<{
               {cepInfo?.localidade === "Belo Horizonte" ? (
                 <div className="mb-3 flex flex-col rounded-md bg-red-600 p-3">
                   {shippingMethods?.map((shippingMethod) => (
-                    <div className="flex justify-between py-1" key={shippingMethod.id}>
+                    <div
+                      className="flex justify-between py-1"
+                      key={shippingMethod.id}
+                    >
                       <div className="flex gap-3 align-middle">
                         <input
                           type="radio"
                           name="deliveryType"
                           id={shippingMethod.id}
                           value={shippingMethod.name}
-                          className=""
+                          className="checkbox h-4 w-4 shrink-0 cursor-pointer appearance-none self-center rounded-full border-4 border-red-600 bg-transparent ring-2 ring-neutral-50 transition-all checked:bg-neutral-50 focus:outline-none"
                           onChange={(e) =>
                             deliveryChangeHandle(e, shippingMethod.price)
                           }
                         />
-                        <label htmlFor={shippingMethod.name}>
+                        <label
+                          htmlFor={shippingMethod.id}
+                          className="cursor-pointer"
+                        >
                           {shippingMethod.name}
                         </label>
                       </div>
