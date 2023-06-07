@@ -29,9 +29,11 @@ const Checkout = () => {
   const [qrCodeImg, setQrCodeImg] = useState("");
   const [paymentURL, setPaymentURL] = useState("");
   const [copyToClipboard, setCopyToClipboard] = useState(false);
-  const [paymentType, setPaymentType] = useState("pix");
+  const [paymentMethod, setPaymentMethod] = useState("pix");
   const [startDate, setStartDate] = useState(addDays(new Date(), 1));
-  const [temPortaria, setTemPortaria] = useState(false);
+  const [hasLobby, setHasLobby] = useState(false);
+  const [paymentState, setPaymentState] = useState("Pendente");
+  const [currentOrderID, setCurrentOrderID] = useState("");
 
   const currentCart = useAppSelector((state) => state.cart);
   const address = useAppSelector((state) => state.address);
@@ -41,12 +43,23 @@ const Checkout = () => {
   const createOrderItem = api.order.createOrderItem.useMutation();
   const addTxid = api.order.addTxid.useMutation();
 
+  const currentOrder = api.order.getOneOrder.useQuery(currentOrderID, {
+    enabled: currentOrderID !== "",
+  });
+
+  useEffect(() => {
+    if (currentOrder.data?.status === "PROCESSING") {
+      setPaymentState("Pago");
+    }
+  }, [currentOrder]);
+
   registerLocale("pt-BR", ptBR);
 
   const form = useFormik({
     initialValues: {
       nome: "",
       sobrenome: "",
+      email: "",
       endereco: address.logradouro,
       numero: "",
       complemento: "",
@@ -57,6 +70,9 @@ const Checkout = () => {
     onSubmit: async (values) => {
       window.scrollTo({ top: 0, behavior: "smooth" });
       setOrderStatus("ordering");
+
+      const deliveryTime = startDate;
+
       const order = {
         ...values,
         items: cart,
@@ -66,6 +82,9 @@ const Checkout = () => {
           id: shipping.id,
         },
         orderTotal: Number(getTotalPriceWithShipping().toFixed(2)),
+        deliveryTime: deliveryTime,
+        paymentMethod: paymentMethod,
+        hasLobby: hasLobby,
       };
 
       console.log("order => ", order);
@@ -75,8 +94,9 @@ const Checkout = () => {
       cart.forEach((cartItem) => {
         createOrderItem.mutate({ ...cartItem, orderId: newOrder.id });
       });
+      setCurrentOrderID(newOrder.id);
 
-      if (paymentType === "pix") {
+      if (paymentMethod === "pix") {
         try {
           const result = await axios.post(
             "https://api-pagamentos.pimentamarshall.com.br/create-order",
@@ -99,7 +119,7 @@ const Checkout = () => {
         }
       }
 
-      if (paymentType === "cardOrBillet") {
+      if (paymentMethod === "cardOrBillet") {
         let itemsFormattedForAPI: itemFormattedForAPI[] = [];
         order.items.forEach((item) => {
           itemsFormattedForAPI.push({
@@ -135,6 +155,7 @@ const Checkout = () => {
     validationSchema: Yup.object({
       nome: Yup.string().required("Campo obrigatório!"),
       sobrenome: Yup.string().required("Campo obrigatório!"),
+      email: Yup.string().email("Insira um endereço de email válido!").required("Campo obrigatório!"),
       endereco: Yup.string().required("Campo obrigatório!"),
       numero: Yup.string().required("Campo obrigatório!"),
       cidade: Yup.string().required("Campo obrigatório!"),
@@ -164,6 +185,10 @@ const Checkout = () => {
     }
   };
 
+  const handleRefreshOrder = () => {
+    currentOrder.refetch();
+  };
+
   return (
     <>
       <Head>
@@ -174,21 +199,23 @@ const Checkout = () => {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <nav className="sticky top-0 z-10 flex justify-center space-x-0 bg-red-600 px-5 align-middle drop-shadow">
-        <div className="flex w-full max-w-2xl justify-between space-x-3 py-2">
-          <Link href={"/"} className="min-w-fit">
-            <Image
-              alt="Marshall icon"
-              src={marshallIcon}
-              className="h-auto w-5"
-            />
-          </Link>
-          <div
-            className="w-full"
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          ></div>
-        </div>
-      </nav>
+      {orderStatus === "pre-order" && (
+        <nav className="sticky top-0 z-10 flex justify-center space-x-0 bg-red-600 px-5 align-middle drop-shadow">
+          <div className="flex w-full max-w-2xl justify-between space-x-3 py-2">
+            <Link href={"/"} className="min-w-fit">
+              <Image
+                alt="Marshall icon"
+                src={marshallIcon}
+                className="h-auto w-5"
+              />
+            </Link>
+            <div
+              className="w-full"
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            ></div>
+          </div>
+        </nav>
+      )}
       <main className="relative flex min-h-screen flex-col items-center overscroll-none bg-neutral-900 pb-16 pt-5">
         <div className="relative flex max-w-2xl flex-col gap-4 px-3">
           {orderStatus === "pre-order" && (
@@ -287,14 +314,14 @@ const Checkout = () => {
                         <div className="mb-2 flex w-fit space-x-3">
                           <input
                             type="radio"
-                            name="portaria"
-                            id="naoTemPortaria"
-                            value="naoTemPortaria"
+                            name="lobby"
+                            id="hasNotLobby"
+                            value="hasNotLobby"
                             className="checkbox h-4 w-4 shrink-0 cursor-pointer appearance-none self-center rounded-full border-4 border-neutral-950 bg-transparent ring-2 ring-neutral-50 transition-all checked:bg-lime-400 focus:outline-none"
-                            onChange={() => void setTemPortaria(false)}
+                            onChange={() => void setHasLobby(false)}
                             defaultChecked
                           />
-                          <label htmlFor="naoTemPortaria">
+                          <label htmlFor="hasNotLobby">
                             <DatePicker
                               selected={startDate}
                               onChange={(date) => setStartDate(date!)}
@@ -302,7 +329,7 @@ const Checkout = () => {
                               showTimeSelect
                               dateFormat="dd/MM/yyyy - HH:mm"
                               locale="pt-BR"
-                              disabled={temPortaria}
+                              disabled={hasLobby}
                               excludeTimes={[
                                 setHours(setMinutes(new Date(), 0), 0),
                                 setHours(setMinutes(new Date(), 30), 0),
@@ -328,9 +355,9 @@ const Checkout = () => {
                                 setHours(setMinutes(new Date(), 30), 23),
                               ]}
                               className={
-                                temPortaria
+                                hasLobby
                                   ? "rounded border border-neutral-700 bg-transparent px-3 py-2 text-neutral-700"
-                                  : "cursor-pointer rounded border border-red-600 bg-transparent px-3 py-2 focus:outline-none focus:bg-neutral-800"
+                                  : "cursor-pointer rounded border border-red-600 bg-transparent px-3 py-2 focus:bg-neutral-800 focus:outline-none"
                               }
                             />
                           </label>
@@ -338,14 +365,14 @@ const Checkout = () => {
                         <div className="flex w-fit space-x-3">
                           <input
                             type="radio"
-                            name="portaria"
-                            id="temPortaria"
-                            value="temPortaria"
+                            name="lobby"
+                            id="hasLobby"
+                            value="hasLobby"
                             className="checkbox h-4 w-4 shrink-0 cursor-pointer appearance-none self-center rounded-full border-4 border-neutral-950 bg-transparent ring-2 ring-neutral-50 transition-all checked:bg-lime-400 focus:outline-none"
-                            onChange={() => void setTemPortaria(true)}
+                            onChange={() => void setHasLobby(true)}
                           />
                           <label
-                            htmlFor="temPortaria"
+                            htmlFor="hasLobby"
                             className="cursor-pointer text-sm"
                           >
                             Destino com serviço de portaria &#40;a entrega pode
@@ -367,11 +394,11 @@ const Checkout = () => {
                   <div className="min-h-24 flex space-x-3 p-3 align-middle">
                     <input
                       type="radio"
-                      name="paymentType"
+                      name="paymentMethod"
                       id="pix"
                       value="pix"
                       className="checkbox h-4 w-4 shrink-0 cursor-pointer appearance-none self-center rounded-full border-4 border-neutral-950 bg-transparent ring-2 ring-neutral-50 transition-all checked:bg-lime-400 focus:outline-none"
-                      onChange={(e) => setPaymentType(e.target.value)}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
                       defaultChecked
                     />
                     <label htmlFor="pix" className="cursor-pointer">
@@ -381,11 +408,11 @@ const Checkout = () => {
                   <div className="min-h-24 flex space-x-3 p-3 align-middle">
                     <input
                       type="radio"
-                      name="paymentType"
+                      name="paymentMethod"
                       id="cardOrBillet"
                       value="cardOrBillet"
                       className="checkbox h-4 w-4 shrink-0 cursor-pointer appearance-none self-center rounded-full border-4 border-neutral-950 bg-transparent ring-2 ring-neutral-50 transition-all checked:bg-lime-400 focus:outline-none"
-                      onChange={(e) => setPaymentType(e.target.value)}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
                     />
                     <label htmlFor="cardOrBillet" className="cursor-pointer">
                       Cartão ou boleto
@@ -446,6 +473,31 @@ const Checkout = () => {
                     {form.errors.sobrenome && form.touched.sobrenome && (
                       <p className="mt-1 text-xs italic text-red-500">
                         {form.errors.sobrenome}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div className="-mx-3 mb-3 flex flex-wrap">
+                  <div className="mb-3 w-full px-3 md:mb-0">
+                    <label
+                      className="mb-2 block text-xs font-bold uppercase tracking-wide text-red-600"
+                      htmlFor="email"
+                    >
+                      Email
+                    </label>
+                    <input
+                      className="block w-full appearance-none rounded border border-neutral-500 bg-neutral-950 px-4 py-3 leading-tight text-neutral-50 placeholder:text-neutral-700 focus:border-neutral-100 focus:bg-neutral-900 focus:outline-none"
+                      id="email"
+                      name="email"
+                      type="text"
+                      placeholder="seuemail@email.com"
+                      onChange={form.handleChange}
+                      onBlur={form.handleBlur}
+                      value={form.values.email}
+                    />
+                    {form.errors.email && form.touched.email && (
+                      <p className="mt-1 text-xs italic text-red-500">
+                        {form.errors.email}
                       </p>
                     )}
                   </div>
@@ -612,8 +664,10 @@ const Checkout = () => {
               <p className="mb-1 block font-bold text-neutral-50">
                 Pix válido por 1 hora:
               </p>
-              <p className="mb-5 block text-center text-xs text-neutral-500">
+              <p className="mb-1 block text-center text-xs text-neutral-500">
                 caso o pagamento não seja efetuado, o pedido será cancelado.
+              </p><p className="mb-5 block text-center text-xs text-neutral-500">
+                Assim que o pagamento for identificado você receberá um email de confirmação.
               </p>
               <p className="mb-2 block text-xs font-bold uppercase tracking-wide text-red-600">
                 PIX QRCode:
@@ -632,12 +686,31 @@ const Checkout = () => {
               />
               <button
                 onClick={() => void handleCopyToClipboard()}
-                className="w-full rounded-lg bg-white/10 px-7 py-3 font-semibold text-white no-underline transition hover:bg-lime-400 hover:text-neutral-950 md:w-fit"
+                className="w-full rounded-lg bg-white/10 px-7 py-3 font-semibold text-white no-underline transition mb-5 hover:bg-lime-400 hover:text-neutral-950 md:w-fit"
               >
                 {copyToClipboard === false
                   ? "Copiar código PIX"
                   : "CÓDIGO PIX COPIADO!"}
               </button>
+              <p className="mb-2 block text-xs font-bold uppercase tracking-wide text-red-600">Status to pagamento:</p>
+              <div className="flex justify-between space-x-2 align-middle bg-neutral-950 rounded-md border border-red-600 p-3 w-full">
+                <p
+                  className={
+                    (paymentState === "Pago"
+                      ? "text-lime-400"
+                      : "text-amber-400") + " text-lg self-center font-bold leading-tight"
+                  }
+                >
+                  {paymentState}
+                </p>
+                <button
+                  className={(currentOrder.isFetching ? "bg-neutral-700" : "bg-red-600") + " rounded px-3 py-2 transition-all"}
+                  onClick={handleRefreshOrder}
+                  disabled={currentOrder.isFetching}
+                >
+                  {currentOrder.isFetching ? "•••" : "Atualizar"}
+                </button>
+              </div>
             </div>
           )}
           {orderStatus === "order-received-cardOrBillet" && (
@@ -651,16 +724,19 @@ const Checkout = () => {
               <p className="mb-1 block text-xs font-bold uppercase tracking-wide text-red-600">
                 Prossiga para o link de pagamento:
               </p>
-              <p className="mb-2 block text-center text-xs text-neutral-500">
+              <p className="mb-3 block text-center text-xs text-neutral-500">
                 você será redirecionado para o sistema seguro da Efí
               </p>
               <a
                 href={paymentURL}
-                className="w-full cursor-pointer rounded-lg bg-white/10 px-7 py-3 font-semibold text-white no-underline transition hover:bg-lime-400 hover:text-neutral-950 md:w-fit"
+                className="w-full cursor-pointer rounded-lg bg-white/10 px-7 py-3 mb-3 font-semibold text-white no-underline transition hover:bg-lime-400 hover:text-neutral-950 md:w-fit"
                 target="_blank"
               >
                 Link de pagamento
               </a>
+              <p className="block text-center text-xs text-neutral-500">
+                Assim que o pagamento for identificado você receberá um email de confirmação.
+              </p>
             </div>
           )}
           {orderStatus === "error" && (

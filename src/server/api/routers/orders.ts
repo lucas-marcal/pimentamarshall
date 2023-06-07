@@ -103,6 +103,8 @@ export const ordersRouter = createTRPCRouter({
       z.object({
         nome: z.string(),
         sobrenome: z.string(),
+        email: z.string().email(),
+        telefone: z.string().optional(),
         endereco: z.string(),
         numero: z.string(),
         complemento: z.string().optional(),
@@ -116,6 +118,9 @@ export const ordersRouter = createTRPCRouter({
           id: z.string(),
         }),
         orderTotal: z.number(),
+        paymentMethod: z.string(),
+        deliveryTime: z.date().optional(),
+        hasLobby: z.boolean(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -123,9 +128,13 @@ export const ordersRouter = createTRPCRouter({
         data: {
           clientName: input.nome,
           clientLastName: input.sobrenome,
+          clientEmail: input.email,
+          clientTel: input.telefone,
           status: "PENDING",
           totalValue: Number(input.orderTotal),
-          paymentMethod: "PIX",
+          paymentMethod: input.paymentMethod,
+          hasLobby: input.hasLobby,
+          deliveryTime: input.deliveryTime,
           shippingAddress: {
             create: {
               address1: input.endereco,
@@ -156,11 +165,11 @@ export const ordersRouter = createTRPCRouter({
       return updatedOrder;
     }),
 
-  getBySlug: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
-    const productBySlug = await ctx.prisma.product.findUnique({
-      where: { urlSlug: input },
+  getOneOrder: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
+    const oneOrder = await ctx.prisma.shopOrder.findUnique({
+      where: { id: input },
     });
 
-    return productBySlug;
+    return oneOrder;
   }),
 });

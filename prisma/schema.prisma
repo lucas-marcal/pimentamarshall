@@ -64,13 +64,17 @@ model ShopOrder {
     updatedAt        DateTime       @updatedAt
     shippingAddress  Address        @relation(fields: [addressId], references: [id])
     addressId        String
-    paymentMethod    PaymentMethod
+    paymentMethod    String
     shippingMethod   ShippingMethod @relation(fields: [shippingMethodId], references: [id])
     shippingMethodId String
+    deliveryTime     DateTime?
+    hasLobby         Boolean
     items            OrderItem[]
     txid             String?
-    clientName       String         @default("Ze")
-    clientLastName   String         @default("Das Couve")
+    clientName       String
+    clientLastName   String
+    clientEmail      String
+    clientTel        String?
 }
 
 model ShoppingSession {
@@ -113,11 +117,6 @@ enum PaymentStatus {
     PENDING
     PROCESSING
     DELIVERED
-}
-
-enum PaymentMethod {
-    PIX
-    PAGSEGURO
 }
 
 // Necessary for Next auth
