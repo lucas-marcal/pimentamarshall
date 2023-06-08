@@ -63,6 +63,7 @@ const Checkout = () => {
       endereco: address.logradouro,
       numero: "",
       complemento: "",
+      bairro: address.bairro,
       cidade: address.localidade,
       estado: address.uf,
       cep: address.cep,
@@ -568,6 +569,28 @@ const Checkout = () => {
                   </div>
                 </div>
                 <div className="-mx-3 mb-2 flex flex-wrap">
+                <div className="mb-3 w-full px-3 md:w-5/12">
+                    <label
+                      className="mb-2 block text-xs font-bold uppercase tracking-wide text-red-600"
+                      htmlFor="bairro"
+                    >
+                      Bairro
+                    </label>
+                    <input
+                      className="block w-full appearance-none rounded border border-neutral-500 bg-neutral-950 px-4 py-3 leading-tight text-neutral-50 placeholder:text-neutral-700 focus:border-neutral-100 focus:bg-neutral-900 focus:outline-none"
+                      id="bairro"
+                      name="bairro"
+                      type="text"
+                      onChange={form.handleChange}
+                      onBlur={form.handleBlur}
+                      value={form.values.bairro}
+                    />
+                    {form.errors.bairro && form.touched.bairro && (
+                      <p className="mt-1 text-xs italic text-red-500">
+                        {form.errors.bairro}
+                      </p>
+                    )}
+                  </div>
                   <div className="mb-3 w-8/12 px-3 md:mb-0 md:w-5/12">
                     <label
                       className="mb-2 block text-xs font-bold uppercase tracking-wide text-red-600"
@@ -617,7 +640,7 @@ const Checkout = () => {
                       )}
                     </div>
                   </div>
-                  <div className="w-full px-3 md:mb-0 md:w-5/12">
+                  <div className="w-full px-3 md:mb-0">
                     <label
                       className="mb-2 block text-xs font-bold uppercase tracking-wide text-red-600"
                       htmlFor="cep"

@@ -54,6 +54,7 @@ export const ordersRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const orderItems = await ctx.prisma.orderItem.findMany({
         where: { shopOrderId: input },
+        include: { item: true }
       });
 
       return orderItems;
@@ -108,6 +109,7 @@ export const ordersRouter = createTRPCRouter({
         endereco: z.string(),
         numero: z.string(),
         complemento: z.string().optional(),
+        bairro: z.string(),
         cidade: z.string(),
         estado: z.string(),
         cep: z.string(),
@@ -140,6 +142,7 @@ export const ordersRouter = createTRPCRouter({
               address1: input.endereco,
               city: input.cidade,
               number: Number(input.numero),
+              bairro: input.bairro,
               region: input.estado,
               zipCode: input.cep,
               complement: input.complemento,
@@ -172,4 +175,13 @@ export const ordersRouter = createTRPCRouter({
 
     return oneOrder;
   }),
+
+  changeOrderStatus: publicProcedure.input(z.string()).mutation(async ({ ctx, input }) => {
+    const updatedOrder = ctx.prisma.shopOrder.update({
+      where: { id: input },
+      data: { status: "DELIVERED" },
+    });
+
+    return updatedOrder;
+  })
 });
