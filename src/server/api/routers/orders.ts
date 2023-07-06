@@ -41,7 +41,7 @@ const orderSchema = z.object({
 const cartSchema = z.array(cartProductSchema);
 
 export const ordersRouter = createTRPCRouter({
-  getAll: publicProcedure.query(async ({ ctx }) => {
+  getAll: protectedProcedure.query(async ({ ctx }) => {
     const orders = await ctx.prisma.shopOrder.findMany({
       orderBy: [{ createdAt: "desc" }],
     });
@@ -54,7 +54,7 @@ export const ordersRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const orderItems = await ctx.prisma.orderItem.findMany({
         where: { shopOrderId: input },
-        include: { item: true }
+        include: { item: true },
       });
 
       return orderItems;
@@ -168,20 +168,24 @@ export const ordersRouter = createTRPCRouter({
       return updatedOrder;
     }),
 
-  getOneOrder: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
-    const oneOrder = await ctx.prisma.shopOrder.findUnique({
-      where: { id: input },
-    });
+  getOneOrder: publicProcedure
+    .input(z.string())
+    .query(async ({ ctx, input }) => {
+      const oneOrder = await ctx.prisma.shopOrder.findUnique({
+        where: { id: input },
+      });
 
-    return oneOrder;
-  }),
+      return oneOrder;
+    }),
 
-  changeOrderStatus: publicProcedure.input(z.string()).mutation(async ({ ctx, input }) => {
-    const updatedOrder = ctx.prisma.shopOrder.update({
-      where: { id: input },
-      data: { status: "DELIVERED" },
-    });
+  changeOrderStatus: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      const updatedOrder = ctx.prisma.shopOrder.update({
+        where: { id: input },
+        data: { status: "DELIVERED" },
+      });
 
-    return updatedOrder;
-  })
+      return updatedOrder;
+    }),
 });
