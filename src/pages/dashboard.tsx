@@ -31,9 +31,13 @@ const Dashboard = () => {
   };
 
   const handleOrderDelivered = async () => {
-    await updateOrder.mutateAsync(selectedOrder);
-    setIsOpen(false);
-    getOrders.refetch();
+    try {
+      await updateOrder.mutateAsync(selectedOrder);
+      setIsOpen(false);
+      await getOrders.refetch();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -165,7 +169,7 @@ const Dashboard = () => {
                         onClick={() => handleOpenModal(item.id)}
                         className="mb-2 mt-4 rounded-md bg-lime-400 px-4 py-2 text-sm font-medium text-lime-900 hover:bg-lime-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
                       >
-                        Marcar como "entregue"
+                        Marcar como &quot;entregue&quot;
                       </button>
                     </div>
                   </div>
@@ -183,7 +187,7 @@ const Dashboard = () => {
               Marcar como entregue
             </Dialog.Title>
             <p className="py-4 text-center">
-              Tem certeza que deseja marcar o pedido como "entregue"?
+              Tem certeza que deseja marcar o pedido como &quot;entregue&quot;?
             </p>
             <div className="mt-2 flex w-full flex-wrap gap-3">
               <button

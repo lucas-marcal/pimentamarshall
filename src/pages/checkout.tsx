@@ -13,13 +13,26 @@ import marshallIcon from "../../public/img/marshall-icn-preto.png";
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { addDays, setHours, setMinutes } from "date-fns";
-import helmetIcon from "../../public/img/helmet-icon.svg";
+import helmetIcon from "../../public/img/helmet-icon.png";
 import ptBR from "date-fns/locale/pt-BR";
 
 interface itemFormattedForAPI {
   name: string;
   value: number;
   amount: number;
+}
+
+interface CreateOrderResponse {
+  ok: number;
+  qrcode: string;
+  imagemQrcode: string;
+  txid: string;
+}
+
+interface CreateOneStepLinkResponse {
+  ok: number;
+  payment_url: string;
+  charge_id: string;
 }
 
 const Checkout = () => {
@@ -99,20 +112,20 @@ const Checkout = () => {
 
       if (paymentMethod === "pix") {
         try {
-          const result = await axios.post(
+          const { data: result } = await axios.post<CreateOrderResponse>(
             "https://api-pagamentos.pimentamarshall.com.br/create-order",
             order
           );
 
           const toUpdateTxid = {
             id: newOrder.id,
-            txid: result.data.txid,
+            txid: result.txid,
           };
 
           addTxid.mutate(toUpdateTxid);
 
-          setQrCode(result.data.qrcode);
-          setQrCodeImg(result.data.imagemQrcode);
+          setQrCode(result.qrcode);
+          setQrCodeImg(result.imagemQrcode);
           setOrderStatus("order-received-pix");
         } catch (error) {
           console.log(error);
@@ -121,7 +134,7 @@ const Checkout = () => {
       }
 
       if (paymentMethod === "cardOrBillet") {
-        let itemsFormattedForAPI: itemFormattedForAPI[] = [];
+        const itemsFormattedForAPI: itemFormattedForAPI[] = [];
         order.items.forEach((item) => {
           itemsFormattedForAPI.push({
             name: item.name,
@@ -137,12 +150,12 @@ const Checkout = () => {
         };
 
         try {
-          const result = await axios.post(
+          const { data: result } = await axios.post<CreateOneStepLinkResponse>(
             "https://api-pagamentos.pimentamarshall.com.br/create-one-step-link",
             cardOrBilletOrder
           );
 
-          setPaymentURL(result.data.payment_url);
+          setPaymentURL(result.payment_url);
           console.log(paymentURL);
           console.log(result);
 
@@ -156,7 +169,9 @@ const Checkout = () => {
     validationSchema: Yup.object({
       nome: Yup.string().required("Campo obrigatório!"),
       sobrenome: Yup.string().required("Campo obrigatório!"),
-      email: Yup.string().email("Insira um endereço de email válido!").required("Campo obrigatório!"),
+      email: Yup.string()
+        .email("Insira um endereço de email válido!")
+        .required("Campo obrigatório!"),
       endereco: Yup.string().required("Campo obrigatório!"),
       numero: Yup.string().required("Campo obrigatório!"),
       cidade: Yup.string().required("Campo obrigatório!"),
@@ -186,8 +201,12 @@ const Checkout = () => {
     }
   };
 
-  const handleRefreshOrder = () => {
-    currentOrder.refetch();
+  const handleRefreshOrder = async () => {
+    try {
+      await currentOrder.refetch();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -569,7 +588,7 @@ const Checkout = () => {
                   </div>
                 </div>
                 <div className="-mx-3 mb-2 flex flex-wrap">
-                <div className="mb-3 w-full px-3 md:w-5/12">
+                  <div className="mb-3 w-full px-3 md:w-5/12">
                     <label
                       className="mb-2 block text-xs font-bold uppercase tracking-wide text-red-600"
                       htmlFor="bairro"
@@ -689,8 +708,10 @@ const Checkout = () => {
               </p>
               <p className="mb-1 block text-center text-xs text-neutral-500">
                 caso o pagamento não seja efetuado, o pedido será cancelado.
-              </p><p className="mb-5 block text-center text-xs text-neutral-500">
-                Assim que o pagamento for identificado você receberá um email de confirmação.
+              </p>
+              <p className="mb-5 block text-center text-xs text-neutral-500">
+                Assim que o pagamento for identificado você receberá um email de
+                confirmação.
               </p>
               <p className="mb-2 block text-xs font-bold uppercase tracking-wide text-red-600">
                 PIX QRCode:
@@ -709,26 +730,33 @@ const Checkout = () => {
               />
               <button
                 onClick={() => void handleCopyToClipboard()}
-                className="w-full rounded-lg bg-white/10 px-7 py-3 font-semibold text-white no-underline transition mb-5 hover:bg-lime-400 hover:text-neutral-950 md:w-fit"
+                className="mb-5 w-full rounded-lg bg-white/10 px-7 py-3 font-semibold text-white no-underline transition hover:bg-lime-400 hover:text-neutral-950 md:w-fit"
               >
                 {copyToClipboard === false
                   ? "Copiar código PIX"
                   : "CÓDIGO PIX COPIADO!"}
               </button>
-              <p className="mb-2 block text-xs font-bold uppercase tracking-wide text-red-600">Status to pagamento:</p>
-              <div className="flex justify-between space-x-2 align-middle bg-neutral-950 rounded-md border border-red-600 p-3 w-full">
+              <p className="mb-2 block text-xs font-bold uppercase tracking-wide text-red-600">
+                Status to pagamento:
+              </p>
+              <div className="flex w-full justify-between space-x-2 rounded-md border border-red-600 bg-neutral-950 p-3 align-middle">
                 <p
                   className={
                     (paymentState === "Pago"
                       ? "text-lime-400"
-                      : "text-amber-400") + " text-lg self-center font-bold leading-tight"
+                      : "text-amber-400") +
+                    " self-center text-lg font-bold leading-tight"
                   }
                 >
                   {paymentState}
                 </p>
                 <button
-                  className={(currentOrder.isFetching ? "bg-neutral-700" : "bg-red-600") + " rounded px-3 py-2 transition-all"}
-                  onClick={handleRefreshOrder}
+                  className={
+                    (currentOrder.isFetching
+                      ? "bg-neutral-700"
+                      : "bg-red-600") + " rounded px-3 py-2 transition-all"
+                  }
+                  onClick={void handleRefreshOrder()}
                   disabled={currentOrder.isFetching}
                 >
                   {currentOrder.isFetching ? "•••" : "Atualizar"}
@@ -752,13 +780,14 @@ const Checkout = () => {
               </p>
               <a
                 href={paymentURL}
-                className="w-full cursor-pointer rounded-lg bg-white/10 px-7 py-3 mb-3 font-semibold text-white no-underline transition hover:bg-lime-400 hover:text-neutral-950 md:w-fit"
+                className="mb-3 w-full cursor-pointer rounded-lg bg-white/10 px-7 py-3 font-semibold text-white no-underline transition hover:bg-lime-400 hover:text-neutral-950 md:w-fit"
                 target="_blank"
               >
                 Link de pagamento
               </a>
               <p className="block text-center text-xs text-neutral-500">
-                Assim que o pagamento for identificado você receberá um email de confirmação.
+                Assim que o pagamento for identificado você receberá um email de
+                confirmação.
               </p>
             </div>
           )}
