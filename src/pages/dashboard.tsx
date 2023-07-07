@@ -1,9 +1,32 @@
 import { Disclosure, Dialog } from "@headlessui/react";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
+import { IncomingMessage, ServerResponse } from "http";
 import Head from "next/head";
 import Image from "next/image";
 import { useState } from "react";
+import { getServerAuthSession } from "~/server/auth";
 import { api } from "~/utils/api";
+
+export async function getServerSideProps(context: {
+  req: IncomingMessage & { cookies: Partial<{ [key: string]: string }> };
+  res: ServerResponse<IncomingMessage>;
+}) {
+  const session = await getServerAuthSession(context);
+
+  // If the user is not authenticated or doesn't have the required role, redirect them
+  if (!session || session.user.role !== "ADMIN") {
+    return {
+      redirect: {
+        destination: "/login", // Redirect to the login page
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {}, // Render the page if the user is authenticated and has the required role
+  };
+}
 
 const Dashboard = () => {
   const [isOpen, setIsOpen] = useState(false);
