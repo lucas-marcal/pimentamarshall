@@ -13,18 +13,17 @@ export async function getServerSideProps(context: {
 }) {
   const session = await getServerAuthSession(context);
 
-  // If the user is not authenticated or doesn't have the required role, redirect them
   if (!session || session.user.role !== "ADMIN") {
     return {
       redirect: {
-        destination: "/login", // Redirect to the login page
+        destination: "/login",
         permanent: false,
       },
     };
   }
 
   return {
-    props: {}, // Render the page if the user is authenticated and has the required role
+    props: {},
   };
 }
 

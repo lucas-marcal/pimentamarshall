@@ -47,6 +47,8 @@ const Checkout = () => {
   const [hasLobby, setHasLobby] = useState(false);
   const [paymentState, setPaymentState] = useState("Pendente");
   const [currentOrderID, setCurrentOrderID] = useState("");
+  const [telNum, setTelNum] = useState("");
+  const [telError, setTelError] = useState(false);
 
   const currentCart = useAppSelector((state) => state.cart);
   const address = useAppSelector((state) => state.address);
@@ -99,6 +101,7 @@ const Checkout = () => {
         deliveryTime: deliveryTime,
         paymentMethod: paymentMethod,
         hasLobby: hasLobby,
+        telefone: telNum,
       };
 
       console.log("order => ", order);
@@ -209,6 +212,15 @@ const Checkout = () => {
     }
   };
 
+  const handleChangeTel = (e: string) => {
+    setTelError(false);
+    if (isNaN(Number(e))) {
+      setTelError(true);
+      return null;
+    }
+    setTelNum(e);
+  };
+
   return (
     <>
       <Head>
@@ -313,7 +325,7 @@ const Checkout = () => {
                     </h1>
                   </div>
                   <div className="w-full">
-                    <div className="mb-4 flex w-full flex-col justify-center gap-3 rounded-md border-2 border-red-600 bg-neutral-950 p-4 align-middle text-neutral-50 sm:flex-row sm:gap-5">
+                    <div className="mb-4 flex w-full flex-col justify-center gap-3 rounded-md border-2 border-red-600 bg-neutral-950 p-4 py-6 align-middle text-neutral-50 sm:flex-row sm:gap-5">
                       <div className="h-16 w-16 shrink-0 self-center rounded-full bg-red-600 p-3">
                         <Image
                           src={helmetIcon}
@@ -327,7 +339,7 @@ const Checkout = () => {
                           Informe quando você gostaria de receber os seus
                           produtos:
                         </p>
-                        <p className="mb-3 text-sm text-red-600">
+                        <p className="mb-5 text-sm text-red-600">
                           Certifique de ter alguém para receber os produtos
                           entre 20min antes e 20min depois do horário informado!
                         </p>
@@ -382,7 +394,7 @@ const Checkout = () => {
                             />
                           </label>
                         </div>
-                        <div className="flex w-fit space-x-3">
+                        <div className="mb-5 flex w-fit space-x-3">
                           <input
                             type="radio"
                             name="lobby"
@@ -399,6 +411,31 @@ const Checkout = () => {
                             ser feita em qualquer dia e horário&#41;
                           </label>
                         </div>
+                        <div className="mb-2 flex w-fit justify-center space-x-3 align-middle">
+                          <label
+                            htmlFor="telNum"
+                            className="cursor-pointer self-center text-sm"
+                          >
+                            Telefone &#40;com DDD&#41;:
+                          </label>
+                          <input
+                            type="tel"
+                            name="telNum"
+                            id="telNum"
+                            onChange={(e) => handleChangeTel(e.target.value)}
+                            className="rounded border border-red-600 bg-transparent px-3 py-2 focus:bg-neutral-800 focus:outline-none"
+                          />
+                        </div>
+                        {telError && (
+                          <p className="mb-1 text-xs text-red-600">
+                            ERRO: O campo de telefone deve conter apenas
+                            números!
+                          </p>
+                        )}
+                        <p className="text-sm text-neutral-500">
+                          Você será avisado no momento da entrega e poderá
+                          acompanhar o trajeto do motoboy.
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -693,7 +730,7 @@ const Checkout = () => {
                 )}
                 <button
                   type="submit"
-                  className="mt-3 w-full self-end rounded-lg bg-white/10 px-7 py-3 font-semibold text-white no-underline transition hover:bg-lime-400 hover:text-neutral-950 md:w-fit"
+                  className="mt-3 w-full self-end rounded-lg bg-lime-400 px-7 py-3 font-semibold text-neutral-950 no-underline transition md:w-fit"
                 >
                   Confirmar compra
                 </button>

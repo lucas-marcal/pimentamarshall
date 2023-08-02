@@ -27,7 +27,7 @@ const Produto = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
   const resellers = api.reseller.getAll.useQuery().data;
 
   const [cart, setCart] = useState<CartState>([]);
-  const [itemsQnty, setItemsQnty] = useState(0)
+  const [itemsQnty, setItemsQnty] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
 
   const currentCart = useAppSelector((state) => state.cart);
@@ -37,7 +37,7 @@ const Produto = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
       (accumulator, item) => accumulator + item.quantity,
       0
     );
-  }
+  };
 
   useEffect(() => {
     setCart(currentCart);
@@ -48,49 +48,51 @@ const Produto = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
     <>
       <Head>
         <title>{`${product.name} | Pimenta Marshall`}</title>
-        <meta
-          name="description"
-          content={product.description}
-        />
+        <meta name="description" content={product.description} />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Navbar setIsOpen={setIsOpen} isOpen={isOpen} />
-      <main className="relative flex flex-col items-center bg-neutral-900 pb-24 pt-5 px-3">
-        <div className="flex flex-col max-w-2xl gap-8">
-          <div className="flex flex-wrap">
-          <Link href={"/"} className="text-red-600">Produtos</Link> 
-          <p className="text-neutral-600 mx-3">/</p>
-          <p className="text-lime-400">{product.name}</p>
+      <div className="absolute -z-10 min-h-full w-full bg-black">
+        <main className="relative flex flex-col items-center bg-neutral-900 px-3 pb-24 pt-5">
+          <div className="flex max-w-2xl flex-col gap-8">
+            <div className="flex flex-wrap">
+              <Link href={"/"} className="text-red-600">
+                Produtos
+              </Link>
+              <p className="mx-3 text-neutral-600">/</p>
+              <p className="text-lime-400">{product.name}</p>
+            </div>
+            <ProductPanel {...product} />
           </div>
-          <ProductPanel {...product} />
-        </div>
-        <a
-          href="https://www.instagram.com/pimentamarshall/"
-          className="absolute -bottom-7 flex rounded-xl border-2 border-red-600 bg-neutral-900 px-7 py-4 align-middle font-semibold text-neutral-50 no-underline transition hover:bg-red-600"
-          target="_blank"
-        >
-          <Image
-            src={instagramIcon}
-            alt="Instagram icon"
-            className="mr-3 inline-block h-auto w-6"
-          />
-          Siga no Instagram
-        </a>
-      </main>
-      <section className="w-full bg-neutral-950 px-3 py-10 pt-16">
-        <h2 className="mb-5 text-center text-2xl font-bold uppercase text-neutral-50">
-          Onde encontrar a Pimenta Marshall:
-        </h2>
-        <div className="mx-auto flex max-w-2xl flex-wrap justify-center gap-8">
-          {resellers && resellers.map((reseller) => (
-            <StoreCard key={reseller.id} {...reseller} />
-          ))}
-        </div>
-      </section>
-      <footer className="w-full bg-black py-3 text-center text-xs text-neutral-700">
-        Copyright &copy; {new Date().getFullYear()} Pimenta Marshall
-      </footer>
-      <ShoppingCart setIsOpen={setIsOpen} isOpen={isOpen} />
+          <a
+            href="https://www.instagram.com/pimentamarshall/"
+            className="absolute -bottom-7 flex rounded-xl border-2 border-red-600 bg-neutral-900 px-7 py-4 align-middle font-semibold text-neutral-50 no-underline transition hover:bg-red-600"
+            target="_blank"
+          >
+            <Image
+              src={instagramIcon}
+              alt="Instagram icon"
+              className="mr-3 inline-block h-auto w-6"
+            />
+            Siga no Instagram
+          </a>
+        </main>
+        <section className="w-full bg-neutral-950 px-3 py-10 pt-16">
+          <h2 className="mb-5 text-center text-2xl font-bold uppercase text-neutral-50">
+            Onde encontrar a Pimenta Marshall:
+          </h2>
+          <div className="mx-auto flex max-w-2xl flex-wrap justify-center gap-8">
+            {resellers &&
+              resellers.map((reseller) => (
+                <StoreCard key={reseller.id} {...reseller} />
+              ))}
+          </div>
+        </section>
+        <footer className="w-full bg-black py-3 text-center text-xs text-neutral-700">
+          Copyright &copy; {new Date().getFullYear()} Pimenta Marshall
+        </footer>
+        <ShoppingCart setIsOpen={setIsOpen} isOpen={isOpen} />
+      </div>
     </>
   );
 };
@@ -144,9 +146,9 @@ const ProductPanel = (props: Product) => {
   };
 
   return (
-    <div className="flex gap-4 flex-wrap sm:flex-nowrap justify-center">
+    <div className="flex flex-wrap justify-center gap-4 sm:flex-nowrap">
       <div className="max-w-sm">
-        <Image src={image} alt={`${name} image`} width={1080} height={1080}/>
+        <Image src={image} alt={`${name} image`} width={1080} height={1080} />
       </div>
       <div className="flex flex-col justify-between space-y-4 sm:max-w-xs">
         <h2 className="rounded-sm bg-neutral-950 p-2 text-2xl font-bold text-red-600">
@@ -188,7 +190,10 @@ const ProductPanel = (props: Product) => {
               +
             </button>
           </div>
-          <button onClick={addToCartHandle} className="rounded-lg bg-white/10 px-7 py-3 font-semibold text-white no-underline transition hover:bg-red-600">
+          <button
+            onClick={addToCartHandle}
+            className="rounded-lg bg-white/10 px-7 py-3 font-semibold text-white no-underline transition hover:bg-red-600"
+          >
             <ShoppingCartIcon className="h-5 w-5" />
           </button>
         </div>
@@ -196,8 +201,6 @@ const ProductPanel = (props: Product) => {
     </div>
   );
 };
-
-
 
 export async function getStaticProps(context: GetStaticPropsContext) {
   const helpers = createServerSideHelpers({
@@ -209,7 +212,7 @@ export async function getStaticProps(context: GetStaticPropsContext) {
   const urlSlug = context.params?.produto as string;
 
   await helpers.product.getBySlug.prefetch(urlSlug);
-  await helpers.reseller.getAll.prefetch()
+  await helpers.reseller.getAll.prefetch();
 
   return {
     props: {
