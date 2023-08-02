@@ -1,13 +1,14 @@
-import {
-  type InferGetStaticPropsType,
-} from "next";
+import { type InferGetStaticPropsType } from "next";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import Head from "next/head";
 import marshallogo from "../../public/img/marshall-logo.png";
 import instagramIcon from "../../public/img/Instagram-icon-white.png";
 import { type RouterOutputs, api } from "~/utils/api";
 import Image from "next/image";
-import { ShoppingCartIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import {
+  ShoppingCartIcon,
+  MagnifyingGlassIcon,
+} from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
 import Navbar from "~/components/Navbar";
 import { appRouter } from "~/server/api/root";
@@ -15,10 +16,7 @@ import { createInnerTRPCContext } from "~/server/api/trpc";
 import SuperJSON from "superjson";
 import StoreCard from "~/components/StoreCard";
 import Link from "next/link";
-import {
-  CartState,
-  addToCart,
-} from "redux/cart.slice";
+import { CartState, addToCart } from "redux/cart.slice";
 import { useAppDispatch, useAppSelector } from "redux/hooks";
 import ShoppingCart from "~/components/ShoppingCart";
 
@@ -38,7 +36,7 @@ const Home = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Navbar setIsOpen={setIsOpen} isOpen={isOpen} />
-      <main className="relative flex min-h-screen flex-col items-center bg-neutral-900 pb-16 pt-5 overscroll-none">
+      <main className="relative flex min-h-screen flex-col items-center overscroll-none bg-neutral-900 pb-16 pt-5">
         <div className="max-w-xs px-5">
           <Image alt="Marshall logo" src={marshallogo} className="" />
         </div>
@@ -52,7 +50,9 @@ const Home = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
           </p>
           <p className="text-neutral-50">
             <span className="font-bold text-red-600">
-              • Se você <span className="text-lime-400">não for de Belo Horizonte</span> e quiser a sua Marshall:
+              • Se você{" "}
+              <span className="text-lime-400">não for de Belo Horizonte</span> e
+              quiser a sua Marshall:
             </span>{" "}
             entre em contato com a gente pelo instagram{" "}
             <a
@@ -97,7 +97,6 @@ const Home = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
       <footer className="w-full bg-black py-3 text-center text-xs text-neutral-700">
         Copyright &copy; {new Date().getFullYear()} Pimenta Marshall
       </footer>
-      
     </>
   );
 };
@@ -114,8 +113,6 @@ interface CartProduct {
   urlSlug: string;
   quantity: number;
 }
-
-
 
 const ProductCard = (props: Product) => {
   const { name, description, image, price, picancia, urlSlug, id } = props;
@@ -237,27 +234,3 @@ export async function getStaticProps() {
     },
   };
 }
-
-// const AuthShowcase: React.FC = () => {
-//   const { data: sessionData } = useSession();
-
-//   const { data: secretMessage } = api.example.getSecretMessage.useQuery(
-//     undefined, // no input
-//     { enabled: sessionData?.user !== undefined }
-//   );
-
-//   return (
-//     <div className="flex flex-col items-center justify-center gap-4">
-//       <p className="text-center text-2xl text-white">
-//         {sessionData && <span>Logged in as {sessionData.user?.name}</span>}
-//         {secretMessage && <span> - {secretMessage}</span>}
-//       </p>
-//       <button
-//         className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
-//         onClick={sessionData ? () => void signOut() : () => void signIn()}
-//       >
-//         {sessionData ? "Sign out" : "Sign in"}
-//       </button>
-//     </div>
-//   );
-// };
