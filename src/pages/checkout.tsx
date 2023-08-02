@@ -66,7 +66,7 @@ const Checkout = () => {
     if (currentOrder.data?.status === "PROCESSING") {
       setPaymentState("Pago");
     }
-  }, [currentOrder]);
+  }, [currentOrderID, paymentState]);
 
   registerLocale("pt-BR", ptBR);
 
@@ -793,7 +793,7 @@ const Checkout = () => {
                       ? "bg-neutral-700"
                       : "bg-red-600") + " rounded px-3 py-2 transition-all"
                   }
-                  onClick={void handleRefreshOrder()}
+                  onClick={() => void handleRefreshOrder()}
                   disabled={currentOrder.isFetching}
                 >
                   {currentOrder.isFetching ? "•••" : "Atualizar"}
