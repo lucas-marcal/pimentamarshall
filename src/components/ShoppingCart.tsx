@@ -286,7 +286,12 @@ const ShoppingCart: React.FC<{
               )}
               <button
                 onClick={() => void goToCheckout()}
-                className="mb-3 rounded-lg bg-white/10 px-7 py-3 font-semibold text-white no-underline transition hover:bg-lime-400 hover:text-neutral-950"
+                className={
+                  "mb-3 rounded-lg px-7 py-3 font-semibold no-underline transition " +
+                  (shipping.type !== ""
+                    ? "bg-lime-400 text-neutral-950"
+                    : "bg-white/10 text-white")
+                }
               >
                 Finalizar a compra{" "}
                 <span className="font-normal">

@@ -115,7 +115,8 @@ interface CartProduct {
 }
 
 const ProductCard = (props: Product) => {
-  const { name, description, image, price, picancia, urlSlug, id } = props;
+  const { name, description, image, price, picancia, urlSlug, id, stock } =
+    props;
   const [count, setCount] = useState(1);
 
   const dispatch = useAppDispatch();
@@ -182,36 +183,44 @@ const ProductCard = (props: Product) => {
         </div>
         <p className="text-neutral-50">{description}</p>
       </div>
-      <div className="flex space-x-3">
-        <div className="flex justify-center rounded-lg border border-red-600 bg-transparent align-middle">
+      {stock !== 0 ? (
+        <div className="flex space-x-3">
+          <div className="flex justify-center rounded-lg border border-red-600 bg-transparent align-middle">
+            <button
+              className="w-8 pb-1 font-bold text-red-600"
+              onClick={qntyDecrement}
+            >
+              –
+            </button>
+            <input
+              type="number"
+              name="qnty"
+              id="qntyOriginal"
+              value={count}
+              className="text-md w-7 bg-transparent text-center font-semibold text-gray-50 outline-none [appearance:textfield] focus:outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none "
+              readOnly
+            />
+            <button
+              className="w-8 pb-1 font-bold text-red-600"
+              onClick={qntyIncrement}
+            >
+              +
+            </button>
+          </div>
           <button
-            className="w-8 pb-1 font-bold text-red-600"
-            onClick={qntyDecrement}
+            onClick={addToCartHandle}
+            className="rounded-lg bg-white/10 px-7 py-3 font-semibold text-white no-underline transition hover:bg-red-600"
           >
-            –
-          </button>
-          <input
-            type="number"
-            name="qnty"
-            id="qntyOriginal"
-            value={count}
-            className="text-md w-7 bg-transparent text-center font-semibold text-gray-50 outline-none [appearance:textfield] focus:outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none "
-            readOnly
-          />
-          <button
-            className="w-8 pb-1 font-bold text-red-600"
-            onClick={qntyIncrement}
-          >
-            +
+            <ShoppingCartIcon className="h-5 w-5" />
           </button>
         </div>
-        <button
-          onClick={addToCartHandle}
-          className="rounded-lg bg-white/10 px-7 py-3 font-semibold text-white no-underline transition hover:bg-red-600"
-        >
-          <ShoppingCartIcon className="h-5 w-5" />
-        </button>
-      </div>
+      ) : (
+        <div className="flex justify-center bg-red-600 p-2 align-middle">
+          <p className="font-bold uppercase tracking-wider">
+            Esgotado :&#39;&#40;
+          </p>
+        </div>
+      )}
     </div>
   );
 };
