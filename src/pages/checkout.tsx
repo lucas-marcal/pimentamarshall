@@ -15,6 +15,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { addDays, setHours, setMinutes } from "date-fns";
 import helmetIcon from "../../public/img/helmet-icon.png";
 import ptBR from "date-fns/locale/pt-BR";
+import Router from "next/router";
 
 interface itemFormattedForAPI {
   name: string;
@@ -67,6 +68,12 @@ const Checkout = () => {
       setPaymentState("Pago");
     }
   }, [currentOrderID, paymentState]);
+
+  useEffect(() => {
+    if (shipping.id === "") {
+      Router.push("/");
+    }
+  }, []);
 
   registerLocale("pt-BR", ptBR);
 
