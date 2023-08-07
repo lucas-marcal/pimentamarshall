@@ -70,8 +70,12 @@ const Checkout = () => {
   }, [currentOrderID, paymentState]);
 
   useEffect(() => {
+    const redirectToHome = async () => {
+      await Router.push("/");
+    };
+
     if (shipping.id === "") {
-      Router.push("/");
+      redirectToHome().catch(console.error);
     }
   }, []);
 
