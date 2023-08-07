@@ -64,12 +64,6 @@ const Checkout = () => {
   });
 
   useEffect(() => {
-    if (currentOrder.data?.status === "PROCESSING") {
-      setPaymentState("Pago");
-    }
-  }, [currentOrderID, paymentState]);
-
-  useEffect(() => {
     const redirectToHome = async () => {
       await Router.push("/");
     };
@@ -218,6 +212,9 @@ const Checkout = () => {
   const handleRefreshOrder = async () => {
     try {
       await currentOrder.refetch();
+      if (currentOrder.data?.status === "PROCESSING") {
+        setPaymentState("Pago");
+      }
     } catch (error) {
       console.log(error);
     }
@@ -814,12 +811,6 @@ const Checkout = () => {
           )}
           {orderStatus === "order-received-cardOrBillet" && (
             <div className="flex flex-col items-center justify-center">
-              {/* <p className="mb-1 block font-bold text-neutral-50">
-                Pix válido por 1 hora:
-              </p>
-              <p className="mb-5 block text-center text-xs text-neutral-500">
-                caso o pagamento não seja efetuado, o pedido será cancelado.
-              </p> */}
               <p className="mb-1 block text-xs font-bold uppercase tracking-wide text-red-600">
                 Prossiga para o link de pagamento:
               </p>
