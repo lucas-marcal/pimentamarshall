@@ -1,7 +1,7 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "redux/hooks";
 import {
-  CartState,
+  type CartState,
   decrementQuantity,
   incrementQuantity,
   removeFromCart,

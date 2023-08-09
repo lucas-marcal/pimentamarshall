@@ -5,7 +5,7 @@ import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { useState, type Dispatch, type SetStateAction, useEffect } from "react";
 import { useAppSelector } from "redux/hooks";
-import { CartState } from "redux/cart.slice";
+import type { CartState } from "redux/cart.slice";
 import ShoppingCart from "./ShoppingCart";
 
 const Navbar: React.FC<{

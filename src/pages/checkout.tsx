@@ -2,8 +2,8 @@ import axios from "axios";
 import { useFormik } from "formik";
 import Head from "next/head";
 import Image from "next/image";
-import { ChangeEvent, useEffect, useState } from "react";
-import { CartState } from "redux/cart.slice";
+import { useEffect, useState } from "react";
+import type { CartState } from "redux/cart.slice";
 import { useAppSelector } from "redux/hooks";
 import Loading from "~/components/Loading";
 import { api } from "~/utils/api";
@@ -72,7 +72,7 @@ const Checkout = () => {
     if (shipping.id === "") {
       redirectToHome().catch(console.error);
     }
-  }, []);
+  }, [shipping.id]);
 
   registerLocale("pt-BR", ptBR);
 
@@ -781,7 +781,11 @@ const Checkout = () => {
               <p className="mb-2 block text-xs font-bold uppercase tracking-wide text-red-600">
                 PIX QRCode:
               </p>
-              <img src={qrCodeImg} className="mb-5" />
+              <img
+                src={qrCodeImg}
+                alt="qrCode para pagamento"
+                className="mb-5"
+              />
               <p className="mb-2 block text-xs font-bold uppercase tracking-wide text-red-600">
                 Chave PIX Copia & Cola:
               </p>

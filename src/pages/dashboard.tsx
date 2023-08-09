@@ -1,6 +1,6 @@
 import { Disclosure, Dialog } from "@headlessui/react";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
-import { IncomingMessage, ServerResponse } from "http";
+import type { IncomingMessage, ServerResponse } from "http";
 import Head from "next/head";
 import Image from "next/image";
 import { useState } from "react";

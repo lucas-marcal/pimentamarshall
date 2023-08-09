@@ -1,4 +1,4 @@
-import { CartState } from "redux/cart.slice";
+import type { CartState } from "redux/cart.slice";
 import { z } from "zod";
 
 import {
@@ -7,29 +7,7 @@ import {
   protectedProcedure,
 } from "~/server/api/trpc";
 
-interface Order {
-  nome: string;
-  sobrenome: string;
-  endereco: string;
-  numero: string;
-  complemento: string;
-  cidade: string;
-  estado: string;
-  cep: string;
-  items: CartState;
-  orderTotal: number;
-}
-
 const cartProductSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  image: z.string(),
-  price: z.number(),
-  urlSlug: z.string(),
-  quantity: z.number(),
-});
-
-const orderSchema = z.object({
   id: z.string(),
   name: z.string(),
   image: z.string(),

@@ -1,4 +1,4 @@
-import {
+import type {
   InferGetStaticPropsType,
   GetStaticPropsContext,
   GetStaticPaths,
@@ -6,7 +6,7 @@ import {
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import Head from "next/head";
 import instagramIcon from "../../../public/img/Instagram-icon-white.png";
-import { RouterOutputs, api } from "~/utils/api";
+import { type RouterOutputs, api } from "~/utils/api";
 import Image from "next/image";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
@@ -16,7 +16,7 @@ import { createInnerTRPCContext } from "~/server/api/trpc";
 import SuperJSON from "superjson";
 import Link from "next/link";
 import StoreCard from "~/components/StoreCard";
-import { CartState, addToCart } from "redux/cart.slice";
+import { type CartState, addToCart } from "redux/cart.slice";
 import { useAppDispatch, useAppSelector } from "redux/hooks";
 import ShoppingCart from "~/components/ShoppingCart";
 

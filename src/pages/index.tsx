@@ -5,20 +5,16 @@ import marshallogo from "../../public/img/marshall-logo.png";
 import instagramIcon from "../../public/img/Instagram-icon-white.png";
 import { type RouterOutputs, api } from "~/utils/api";
 import Image from "next/image";
-import {
-  ShoppingCartIcon,
-  MagnifyingGlassIcon,
-} from "@heroicons/react/24/outline";
-import { useEffect, useState } from "react";
+import { ShoppingCartIcon } from "@heroicons/react/24/outline";
+import { useState } from "react";
 import Navbar from "~/components/Navbar";
 import { appRouter } from "~/server/api/root";
 import { createInnerTRPCContext } from "~/server/api/trpc";
 import SuperJSON from "superjson";
 import StoreCard from "~/components/StoreCard";
 import Link from "next/link";
-import { CartState, addToCart } from "redux/cart.slice";
-import { useAppDispatch, useAppSelector } from "redux/hooks";
-import ShoppingCart from "~/components/ShoppingCart";
+import { addToCart } from "redux/cart.slice";
+import { useAppDispatch } from "redux/hooks";
 
 const Home = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -112,15 +108,6 @@ const Home = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
 export default Home;
 
 type Product = RouterOutputs["product"]["getAll"][number];
-
-interface CartProduct {
-  name: string;
-  id: string;
-  image: string;
-  price: number;
-  urlSlug: string;
-  quantity: number;
-}
 
 const ProductCard = (props: Product) => {
   const { name, description, image, price, picancia, urlSlug, id, stock } =
