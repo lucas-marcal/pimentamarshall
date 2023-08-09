@@ -50,6 +50,7 @@ const Checkout = () => {
   const [currentOrderID, setCurrentOrderID] = useState("");
   const [telNum, setTelNum] = useState("");
   const [telError, setTelError] = useState(false);
+  const [telErrorText, setTelErrorText] = useState("");
 
   const currentCart = useAppSelector((state) => state.cart);
   const address = useAppSelector((state) => state.address);
@@ -89,6 +90,14 @@ const Checkout = () => {
       cep: address.cep,
     },
     onSubmit: async (values) => {
+      setTelError(false);
+
+      if (shipping.type === "Motoboy" && telNum === "") {
+        setTelError(true);
+        setTelErrorText("O campo telefone é obrigatório!");
+        return null;
+      }
+
       window.scrollTo({ top: 0, behavior: "smooth" });
       setOrderStatus("ordering");
 
@@ -224,6 +233,7 @@ const Checkout = () => {
     setTelError(false);
     if (isNaN(Number(e))) {
       setTelError(true);
+      setTelErrorText("ERRO: O campo de telefone deve conter apenas números!");
       return null;
     }
     setTelNum(e);
@@ -431,13 +441,15 @@ const Checkout = () => {
                             name="telNum"
                             id="telNum"
                             onChange={(e) => handleChangeTel(e.target.value)}
-                            className="rounded border border-red-600 bg-transparent px-3 py-2 focus:bg-neutral-800 focus:outline-none"
+                            className={
+                              "rounded border border-red-600 bg-transparent px-3 py-2 focus:bg-neutral-800 focus:outline-none " +
+                              (telError ? "bg-red-950" : "")
+                            }
                           />
                         </div>
                         {telError && (
                           <p className="mb-1 text-xs text-red-600">
-                            ERRO: O campo de telefone deve conter apenas
-                            números!
+                            {telErrorText}
                           </p>
                         )}
                         <p className="text-sm text-neutral-500">
@@ -733,6 +745,14 @@ const Checkout = () => {
                     <p className="w-full rounded bg-red-600 p-2 text-center text-sm leading-tight">
                       <span className="font-bold">Erro: </span>Preencha o todos
                       os campos corretamente.
+                    </p>
+                  </div>
+                )}
+                {telError && (
+                  <div className="mt-2 flex justify-center align-middle">
+                    <p className="w-full rounded bg-red-600 p-2 text-center text-sm leading-tight">
+                      <span className="font-bold">Erro: </span>
+                      {telErrorText}
                     </p>
                   </div>
                 )}
