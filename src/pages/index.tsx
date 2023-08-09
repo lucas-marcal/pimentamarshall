@@ -33,6 +33,14 @@ const Home = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
           name="description"
           content="A Marshall é um molho de pimenta artesanal de produção minúscula fermentado com especiarias no estilo sriracha."
         />
+        <meta
+          property="og:description"
+          content="A Marshall é um molho de pimenta artesanal de produção minúscula fermentado com especiarias no estilo sriracha."
+        />
+        <meta
+          property="og:image"
+          content="https://pimentamarshall.com.br/img/marshall-thumb.png"
+        />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Navbar setIsOpen={setIsOpen} isOpen={isOpen} />
