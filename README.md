@@ -1,28 +1,27 @@
-# Create T3 App
+# Ecommerce Pimenta Marshall 🌶️
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+Este é o repositório oficial do site da Pimenta Marshall, criado utilizando a [T3 Stack](https://create.t3.gg/) e utilizando um [backend em NodeJS](https://github.com/lucas-marcal/pimentamarshall-backend) desenvolvido para conectar com a API de pagamentos do [Efí Bacnk](https://sejaefi.com.br/).
 
-## What's next? How do I make an app with this?
+## Por que fazer o backend separado?
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+Por determinação do Banco Central é necessário a adesão ao protocolo mTLS para a comunicação entre o site e o banco (Efí Bank). Como ainda não é possível realizar essa configuração utilizando somente os serviços da [Vercel](https://vercel.com/), foi necessário a configuração do backend separadamente, que atualmente está hospedado em um droplet na [Digitalocean](https://www.digitalocean.com/).
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+## Por que não utilizar uma plataforma de Ecommerce (VTEX, Shopify, etc.)?
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+Faz parte do desafio! 😉
+Este site é, antes de mais nada, uma maneira para que eu consiga experimentar novas tecnologias e melhorar as minhas habilidades como programador. Além disso, as necessidades técnicas para vender alguns molhos de pimenta são simples o suficiente para que não justifique o gasto recorrente significativo com qualquer uma desta plataformas.
 
-## Learn More
+---
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+# Ecommerce Marshall's Hot Sauce 🌶️
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+This is the official repository of the Pimenta Marshall website, created using the [T3 Stack](https://create.t3.gg/) and utilizing a [NodeJS backend](https://github.com/lucas-marcal/pimentamarshall-backend) developed to connect with the payment API of [Efí Bank](https://sejaefi.com.br/).
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+## Why have a separate backend?
 
-## How do I deploy this?
+Due to the mandate from the Central Bank, adherence to the mTLS protocol for communication between the website and the bank (Efí Bank) is required. As it is currently not possible to configure this using only [Vercel](https://vercel.com/) services, a separate backend configuration was necessary. The backend is currently hosted on a droplet at [DigitalOcean](https://www.digitalocean.com/).
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+## Why not use an Ecommerce platform (VTEX, Shopify, etc.)?
+
+It's part of the challenge! 😉
+This website is, first and foremost, a way for me to experiment with new technologies and improve my skills as a programmer. Additionally, the technical requirements for selling some hot sauces are simple enough that they do not justify significant recurring expenses with any of these platforms.
