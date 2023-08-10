@@ -50,6 +50,10 @@ const Produto = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
         <title>{`${product.name} | Pimenta Marshall`}</title>
         <meta name="description" content={product.description} />
         <link rel="icon" href="/favicon.ico" />
+        <meta
+          property="og:title"
+          content={`${product.name} | Pimenta Marshall`}
+        />
         <meta property="og:description" content={product.description} />
         <meta
           property="og:image"

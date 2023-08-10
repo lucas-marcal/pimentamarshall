@@ -24,10 +24,14 @@ const Home = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
   return (
     <>
       <Head>
-        <title>Home | Pimenta Marshall</title>
+        <title>Marshall - Molho de pimenta artesanal</title>
         <meta
           name="description"
           content="A Marshall é um molho de pimenta artesanal de produção minúscula fermentado com especiarias no estilo sriracha."
+        />
+        <meta
+          property="og:title"
+          content="Marshall - Molho de pimenta artesanal"
         />
         <meta
           property="og:description"
