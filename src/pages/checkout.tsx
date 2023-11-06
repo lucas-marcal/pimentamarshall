@@ -118,10 +118,7 @@ const Checkout = () => {
         telefone: telNum,
       };
 
-      console.log("order => ", order);
-
       const newOrder = await createOrder.mutateAsync(order);
-      console.log("newOrder => ", newOrder);
       cart.forEach((cartItem) => {
         createOrderItem.mutate({ ...cartItem, orderId: newOrder.id });
       });
@@ -173,8 +170,6 @@ const Checkout = () => {
           );
 
           setPaymentURL(result.payment_url);
-          console.log(paymentURL);
-          console.log(result);
 
           setOrderStatus("order-received-cardOrBillet");
         } catch (error) {
