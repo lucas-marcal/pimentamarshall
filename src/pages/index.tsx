@@ -74,9 +74,11 @@ const Home = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
           </p>
         </div>
         <div className="flex max-w-2xl flex-wrap justify-center gap-8">
-          {products?.map((product) => (
-            <ProductCard key={product.id} {...product} />
-          ))}
+          {products?.map((product) => {
+            if (product.isActive === true) {
+              return <ProductCard key={product.id} {...product} />;
+            }
+          })}
         </div>
         <a
           href="https://www.instagram.com/pimentamarshall/"
