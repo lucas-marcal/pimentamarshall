@@ -66,11 +66,11 @@ const ShoppingCart: React.FC<{
         setErrorMsg("Escolha uma forma de entrega!");
         return null;
       }
-      if (getTotalPrice() < 25) {
-        setError(true);
-        setErrorMsg("O pedido mínimo é R$25!");
-        return null;
-      }
+      // if (getTotalPrice() < 25) {
+      //   setError(true);
+      //   setErrorMsg("O pedido mínimo é R$25!");
+      //   return null;
+      // }
       dispatch(setAddress(cepInfo));
       await Router.push("/checkout");
     } catch (error) {
